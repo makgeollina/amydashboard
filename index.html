@@ -1,0 +1,2200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amy's Time Countdown Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #fff9f7 0%, #f0f9ff 100%);
+            color: #1a1a1a;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* COMPACT HEADER */
+        .header {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto auto auto;
+            gap: 2rem;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(240, 128, 128, 0.2);
+        }
+        
+        .header-time {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        
+        .header-stat {
+            text-align: center;
+            min-width: 100px;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ff6b9d;
+        }
+        
+        .blocked-time {
+            background: linear-gradient(135deg, #ffe8eb 0%, #fff0f3 100%);
+            border: 2px solid #ff6b9d;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 150px;
+        }
+        
+        .blocked-time-title {
+            color: #ff6b9d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+        
+        .blocked-time-detail {
+            color: #1a1a1a;
+            font-size: 9px;
+            line-height: 1.3;
+        }
+        
+        .sleep-stat {
+            text-align: center;
+            min-width: 90px;
+        }
+        
+        .sleep-countdown {
+            font-size: 16px;
+            font-weight: 700;
+            color: #9C27B0;
+            margin-bottom: 2px;
+        }
+        
+        .sleep-countdown-label {
+            font-size: 10px;
+            color: #999;
+        }
+        
+        .calendar-status {
+            font-size: 9px;
+            color: #4CAF50;
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        /* DAILY PROGRESS BAR */
+        .daily-progress-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(240, 128, 128, 0.2);
+        }
+        
+        .daily-progress-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+        
+        .daily-progress-bar {
+            display: flex;
+            height: 20px;
+            background: rgba(240, 240, 240, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(200, 200, 200, 0.3);
+            margin-bottom: 1rem;
+        }
+        
+        .progress-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 700;
+            color: white;
+            transition: flex 0.3s;
+            min-width: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-segment-label {
+            font-size: 8px;
+            white-space: nowrap;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .progress-legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            font-size: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        /* MOTIVE SECTION */
+        .motive-section {
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.08) 0%, rgba(196, 175, 80, 0.08) 100%);
+            border: 2px solid rgba(255, 107, 157, 0.2);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .motive-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .motive-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 107, 157, 0.3);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            outline: none;
+            color: #1a1a1a;
+            background: rgba(255, 255, 255, 0.7);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .motive-input:focus {
+            border-color: #ff6b9d;
+            background: white;
+        }
+        
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid rgba(240, 128, 128, 0.2);
+            padding-bottom: 1rem;
+            overflow-x: auto;
+        }
+        
+        .tab-btn {
+            background: transparent;
+            color: #888;
+            border: none;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+        
+        .tab-btn.active {
+            color: #ff6b9d;
+            border-bottom: 3px solid #ff6b9d;
+            padding-bottom: 5px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* OVERVIEW STYLES */
+        .section-title {
+            font-size: 16px;
+            color: #1a1a1a;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0 0 1.5rem 0;
+            font-weight: 700;
+        }
+        
+        .allocations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .allocation-card {
+            border: 2px solid;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+        
+        .allocation-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .allocation-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .allocation-hours {
+            font-size: 36px;
+            font-weight: 700;
+        }
+        
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+        
+        .day-card {
+            border: 2px solid;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .day-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .day-icon {
+            font-size: 24px;
+            margin: 8px 0;
+        }
+        
+        .day-type {
+            font-size: 10px;
+            color: #888;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+        
+        /* EXPANDED DAY CARD */
+        .expanded-day-card {
+            border: 2px solid;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .day-header {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        
+        .day-icon {
+            font-size: 24px;
+            margin: 8px 0;
+        }
+        
+        .day-type {
+            font-size: 10px;
+            color: #888;
+            margin: 6px 0;
+            font-weight: 500;
+        }
+        
+        .day-habits {
+            border-top: 1px solid rgba(0,0,0,0.1);
+            margin-top: 10px;
+            padding-top: 10px;
+            text-align: left;
+        }
+        
+        .habit-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .habit-item:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .habit-item.checked {
+            background: rgba(76, 175, 80, 0.2);
+        }
+        
+        .habit-checkbox-small {
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            accent-color: #4CAF50;
+            flex-shrink: 0;
+        }
+        
+        .habit-label-small {
+            font-size: 9px;
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .day-blocks {
+            border-top: 1px solid rgba(0,0,0,0.1);
+            margin-top: 10px;
+            padding-top: 10px;
+            text-align: left;
+        }
+        
+        .block-item {
+            font-size: 8px;
+            color: #ff6b9d;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+        
+        .block-time {
+            font-size: 8px;
+            color: #999;
+        }
+        
+        /* TIMERS (FOCUS MODE) STYLES */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 250px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .focus-panel {
+            background: linear-gradient(135deg, #fff9f7 0%, #f0f9ff 100%);
+            border: 3px solid #ff6b9d;
+            padding: 3rem 2rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(255, 107, 157, 0.15);
+        }
+        
+        .focus-project-name {
+            font-size: 14px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+        
+        .focus-timer {
+            font-size: 96px;
+            font-weight: 700;
+            color: #ff6b9d;
+            font-family: 'Monaco', monospace;
+            letter-spacing: 4px;
+            margin: 2rem 0;
+            line-height: 1;
+        }
+        
+        .focus-tag-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ff6b9d;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .focus-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .focus-btn {
+            background: #ff6b9d;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .focus-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(255, 107, 157, 0.3);
+        }
+        
+        .focus-btn.stop {
+            background: white;
+            color: #ff6b9d;
+            border: 2px solid #ff6b9d;
+            text-shadow: none;
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .project-selector {
+            background: white;
+            border: 2px solid;
+            padding: 14px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #1a1a1a;
+        }
+        
+        .project-selector:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .project-selector.active {
+            background: linear-gradient(135deg, var(--color) 0%, var(--color)80 100%);
+            color: white;
+            border-color: var(--color);
+            transform: scale(1.05);
+        }
+        
+        .project-hours {
+            font-size: 11px;
+            margin-top: 6px;
+            opacity: 0.8;
+        }
+        
+        .project-hours-value {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        
+        /* AD-HOC TASKS */
+        .adhoc-section {
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 107, 157, 0.05) 100%);
+            border: 2px solid rgba(255, 107, 157, 0.3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .adhoc-title {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .adhoc-input-group {
+            display: grid;
+            grid-template-columns: 1fr 80px;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .adhoc-input {
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+        
+        .adhoc-hours-input {
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+            text-align: center;
+        }
+        
+        .adhoc-add-btn {
+            background: #ff6b9d;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .adhoc-add-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .adhoc-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .adhoc-task {
+            background: white;
+            border: 1px solid rgba(255, 107, 157, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .adhoc-task:hover {
+            background: rgba(255, 107, 157, 0.05);
+            transform: translateX(2px);
+        }
+        
+        .adhoc-task-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .adhoc-task-hours {
+            font-size: 12px;
+            font-weight: 700;
+            color: #ff6b9d;
+            background: rgba(255, 107, 157, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+        
+        /* HABITS */
+        .habits-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .habit-card {
+            background: white;
+            border: 2px solid #f08080;
+            padding: 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .habit-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(240, 128, 128, 0.2);
+        }
+        
+        .habit-card.checked {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe8eb 100%);
+            border-color: #ff6b9d;
+        }
+        
+        .habit-checkbox {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            accent-color: #ff6b9d;
+        }
+        
+        .habit-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .habit-desc {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .exercise-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 1rem;
+        }
+        
+        .exercise-input {
+            padding: 8px 12px;
+            border: 1px solid #f08080;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+        
+        /* FITNESS */
+        .fitness-container {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f0fff4 100%);
+            border: 2px solid #4CAF50;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .fitness-label {
+            font-size: 12px;
+            color: #4CAF50;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .step-display {
+            font-size: 56px;
+            font-weight: 700;
+            color: #4CAF50;
+            margin-bottom: 8px;
+        }
+        
+        .step-goal {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 1.5rem;
+        }
+        
+        .progress-bar {
+            background: rgba(76, 175, 80, 0.2);
+            height: 8px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #81C784);
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s;
+        }
+        
+        .step-input-group {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .step-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+        
+        .step-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .step-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(240, 128, 128, 0.2);
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER (HORIZONTAL & COMPACT) -->
+        <div class="header">
+            <div class="header-time" id="dateDisplay">Mon, May 18 • 12:48 PM</div>
+            
+            <div></div> <!-- spacer -->
+            
+            <div class="header-stat">
+                <div class="stat-label">Free time</div>
+                <div class="stat-value" id="hoursLeft">16h</div>
+            </div>
+            
+            <div class="blocked-time">
+                <div class="blocked-time-title">📅 Blocked</div>
+                <div class="blocked-time-detail" id="blockedTimeDetail">50m (NERD 8pm)</div>
+            </div>
+            
+            <div class="sleep-stat">
+                <div class="sleep-countdown" id="sleepCountdown">12h 41m</div>
+                <div class="sleep-countdown-label">until sleep</div>
+            </div>
+            
+            <div class="calendar-status" id="calendarStatus">📡 Synced</div>
+        </div>
+
+        <!-- DAILY PROGRESS BAR -->
+        <div class="daily-progress-section">
+            <div class="daily-progress-label">📊 Your day today</div>
+            <div class="daily-progress-bar" id="dailyProgressBar"></div>
+            <div class="progress-legend" id="progressLegend"></div>
+        </div>
+
+        <!-- MOTIVE SECTION -->
+        <div class="motive-section">
+            <div class="motive-label">✨ Motive for the week</div>
+            <input type="text" class="motive-input" id="motiveInput" placeholder="I am building a life of creative freedom and aligned impact." onchange="saveMotive()">
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-btn" onclick="switchTab('daily')">Daily</button>
+            <button class="tab-btn" onclick="switchTab('timers')">Timers</button>
+            <button class="tab-btn" onclick="switchTab('habits')">Habits</button>
+            <button class="tab-btn" onclick="switchTab('fitness')">Fitness</button>
+            <button class="tab-btn" onclick="switchTab('report')">Report</button>
+        </div>
+
+        <!-- OVERVIEW TAB -->
+        <div id="overview" class="tab-content active">
+            <h2 class="section-title">⏱️ Time tokens this week</h2>
+            <div class="allocations-grid" id="allocationsGrid"></div>
+
+            <h3 class="section-title">📅 This week at a glance</h3>
+            
+            <!-- WEEK GRID WITH HABITS & BLOCKS -->
+            <div class="week-grid" id="weekGridWithDetails"></div>
+        </div>
+
+        <!-- DAILY REPORT TAB -->
+        <div id="daily" class="tab-content">
+            <h2 class="section-title">📋 Today's Summary</h2>
+            
+            <div style="background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(156, 39, 176, 0.05) 100%); border: 2px solid rgba(156, 39, 176, 0.2); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 700;">🎯 Your motive today</div>
+                <div id="dailyMotive" style="font-size: 14px; color: #9C27B0; font-weight: 600; line-height: 1.5; font-style: italic;"></div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 2rem;" id="dailyProjectCards"></div>
+
+            <h3 class="section-title">⏰ Time Breakdown</h3>
+            <div style="background: rgba(255, 107, 157, 0.08); border: 2px solid rgba(255, 107, 157, 0.2); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                <div style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; font-weight: 700;">Hours logged today</div>
+                <div id="dailyBreakdown" style="display: flex; flex-direction: column; gap: 8px;"></div>
+            </div>
+
+            <h3 class="section-title">✅ Tasks Today</h3>
+            <div id="dailyTasksSummary" style="background: rgba(76, 175, 80, 0.08); border: 2px solid rgba(76, 175, 80, 0.2); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;"></div>
+
+            <h3 class="section-title">🎯 Habits Checked</h3>
+            <div id="dailyHabitsSummary" style="background: rgba(156, 39, 176, 0.08); border: 2px solid rgba(156, 39, 176, 0.2); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;"></div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button onclick="archiveDailyData()" style="background: #ff6b9d; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">📊 End Day & Archive</button>
+            </div>
+        </div>
+        <div id="timers" class="tab-content">
+            <div class="main-layout">
+                <!-- LEFT: FOCUS MODE + PROJECT TASKS -->
+                <div>
+                    <!-- FOCUS TIMER -->
+                    <div class="focus-panel" id="focusPanel">
+                        <div class="focus-project-name" id="focusProjectName">Select a project</div>
+                        <div class="focus-timer" id="focusTimer">--:--:--</div>
+                        <input type="text" class="focus-tag-input" id="focusTag" placeholder="What are you working on? (tag)">
+                        <div class="focus-buttons">
+                            <button class="focus-btn" id="focusPlayBtn" onclick="toggleFocusTimer()">▶ Start</button>
+                            <button class="focus-btn stop" id="focusStopBtn" onclick="pauseFocusTimer()" style="display: none;">⏸ Pause</button>
+                        </div>
+                        <button class="adhoc-add-btn" style="background: #4CAF50; margin-top: 1rem;" id="focusLogBtn" onclick="logFocusTime()" style="display: none;">✓ Log this time</button>
+                    </div>
+
+                    <!-- PROJECT-SPECIFIC TASKS -->
+                    <div class="adhoc-section" id="activeProjectTasks" style="margin-top: 2rem;">
+                        <div class="adhoc-title" id="activeProjectTasksTitle">Select a project to add tasks</div>
+                        <div id="activeProjectTasksList"></div>
+                    </div>
+
+                    <!-- MANUAL TIME ENTRY -->
+                    <div class="adhoc-section" style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%); border-color: rgba(76, 175, 80, 0.3); margin-top: 2rem;">
+                        <div class="adhoc-title" style="color: #4CAF50;">📝 Log time manually</div>
+                        <div style="font-size: 10px; color: #888; margin-bottom: 1rem;">For things you did earlier (past work session)</div>
+                        <div class="adhoc-input-group">
+                            <select id="manualProjectSelect" style="padding: 10px 12px; border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 6px; font-size: 12px; outline: none;">
+                                <option value="">Select project...</option>
+                                <option value="spotlite">Spotlite</option>
+                                <option value="nerd">NERD</option>
+                                <option value="makgeollina">@makgeollina_ipo</option>
+                                <option value="reading">Reading</option>
+                                <option value="creative">Creative Block</option>
+                                <option value="misc">Misc</option>
+                            </select>
+                            <input type="number" step="0.5" id="manualHoursInput" placeholder="hrs" value="1" style="padding: 10px 12px; border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 6px; font-size: 12px; text-align: center;">
+                        </div>
+                        <input type="text" id="manualTagInput" placeholder="Tag/description (optional)" style="width: 100%; padding: 10px 12px; border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 6px; font-size: 12px; outline: none; margin-bottom: 1rem;">
+                        <button class="adhoc-add-btn" style="background: #4CAF50;" onclick="logTimeManually()">✓ Log this time</button>
+                    </div>
+                </div>
+
+                <!-- SIDEBAR: PROJECT SWITCHERS -->
+                <div class="sidebar" id="sidebar"></div>
+            </div>
+        </div>
+
+        <!-- CUMULATIVE REPORT TAB -->
+        <div id="report" class="tab-content">
+            <h2 class="section-title">📊 Weekly Cumulative Report</h2>
+            
+            <!-- PROJECT SUMMARIES -->
+            <div id="reportSummaries"></div>
+
+            <!-- RESET BUTTON -->
+            <div style="margin-top: 3rem; text-align: center;">
+                <button onclick="resetWeeklyData()" style="background: #E91E63; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">🔄 Reset for new week</button>
+            </div>
+        </div>
+        <div id="habits" class="tab-content">
+            <!-- ADD NEW HABIT -->
+            <div class="adhoc-section" style="background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(156, 39, 176, 0.05) 100%); border-color: rgba(156, 39, 176, 0.3); margin-bottom: 2rem;">
+                <div class="adhoc-title" style="color: #9C27B0;">➕ Add new habit</div>
+                <input type="text" id="newHabitName" placeholder="Habit name (e.g., 'Meditation')" style="width: 100%; padding: 10px 12px; border: 1px solid rgba(156, 39, 176, 0.3); border-radius: 6px; font-size: 12px; outline: none; margin-bottom: 1rem;">
+                <div style="font-size: 11px; color: #888; margin-bottom: 0.5rem; font-weight: 700; text-transform: uppercase;">Repeat on:</div>
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 1rem;">
+                    <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
+                        <input type="checkbox" class="day-checkbox" value="Mon" style="cursor: pointer;"> M
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
+                        <input type="checkbox" class="day-checkbox" value="Tue" style="cursor: pointer;"> T
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
+                        <input type="checkbox" class="day-checkbox" value="Wed" style="cursor: pointer;"> W
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
+                        <input type="checkbox" class="day-checkbox" value="Thu" style="cursor: pointer;"> TH
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
+                        <input type="checkbox" class="day-checkbox" value="Fri" style="cursor: pointer;"> F
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
+                        <input type="checkbox" class="day-checkbox" value="Sat" style="cursor: pointer;"> SA
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 4px; font-size: 11px; cursor: pointer;">
+                        <input type="checkbox" class="day-checkbox" value="Sun" style="cursor: pointer;"> SU
+                    </label>
+                </div>
+                <button class="adhoc-add-btn" style="background: #9C27B0;" onclick="addCustomHabit()">+ Create habit</button>
+            </div>
+
+            <!-- DEFAULT HABITS -->
+            <h3 class="section-title">📋 Default habits</h3>
+            <div class="habits-grid" id="habitsGrid"></div>
+
+            <!-- CUSTOM HABITS -->
+            <h3 class="section-title">✨ Custom habits</h3>
+            <div id="customHabitsGrid"></div>
+        </div>
+
+        <!-- FITNESS TAB -->
+        <div id="fitness" class="tab-content">
+            <div class="fitness-container">
+                <div class="fitness-label">Today's steps</div>
+                <div class="step-display" id="stepDisplay">0</div>
+                <div class="step-goal">Goal: 10,000 steps/day</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="step-input-group">
+                    <input type="number" class="step-input" id="stepInput" placeholder="Log today's steps">
+                    <button class="step-btn" onclick="logSteps()">Log</button>
+                </div>
+            </div>
+
+            <!-- EXERCISE LOG -->
+            <h3 class="section-title">💪 Log exercise</h3>
+            <div style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%); border: 2px solid rgba(76, 175, 80, 0.3); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                <div style="display: grid; grid-template-columns: 1fr 60px 60px; gap: 10px; margin-bottom: 1rem;">
+                    <input type="text" id="exerciseName" placeholder="Exercise (e.g., 'Run', 'Pilates')" style="padding: 10px 12px; border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 6px; font-size: 12px;">
+                    <input type="number" id="exerciseReps" placeholder="x#" style="padding: 10px 12px; border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 6px; font-size: 12px; text-align: center;" title="Distance/Duration/Reps">
+                    <select id="exerciseUnit" style="padding: 10px 6px; border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 6px; font-size: 11px;">
+                        <option value="km">km</option>
+                        <option value="mi">mi</option>
+                        <option value="min">min</option>
+                        <option value="reps">reps</option>
+                        <option value="sets">sets</option>
+                    </select>
+                </div>
+                <button class="adhoc-add-btn" style="background: #4CAF50;" onclick="addExerciseLog()">+ Log exercise</button>
+            </div>
+
+            <!-- FOOD LOG -->
+            <h3 class="section-title">🍽️ Log food</h3>
+            <div style="background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 107, 157, 0.05) 100%); border: 2px solid rgba(255, 107, 157, 0.3); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                <input type="text" id="foodName" placeholder="Food (e.g., 'Acai bowl, coffee')" style="width: 100%; padding: 10px 12px; border: 1px solid rgba(255, 107, 157, 0.3); border-radius: 6px; font-size: 12px; margin-bottom: 1rem;">
+                <button class="adhoc-add-btn" style="background: #ff6b9d;" onclick="addFoodLog()">+ Log food</button>
+            </div>
+
+            <!-- LOG DISPLAY -->
+            <h3 class="section-title">📝 Today's log</h3>
+            <div id="fitnessLogDisplay"></div>
+
+            <h3 class="section-title">📊 This week steps</h3>
+            <div class="week-grid" id="stepsWeekGrid"></div>
+        </div>
+
+        <div class="footer">
+            Data saved locally • Last updated: <span id="lastUpdated"></span>
+        </div>
+    </div>
+
+    <script>
+        const projects = {
+            spotlite: { name: 'Spotlite', target: 12, color: '#9C27B0' },
+            nerd: { name: 'NERD', target: 10, color: '#FF9800' },
+            makgeollina: { name: '@makgeollina_ipo', target: 10, color: '#2196F3' },
+            reading: { name: 'Reading', target: 10.5, color: '#4CAF50' },
+            creative: { name: 'Creative Block', target: 63, color: '#E91E63' },
+            misc: { name: 'Misc', target: 0, color: '#999999' }, // No target, just tracks
+        };
+
+        const allocations = {
+            sleep: { hours: 49, color: '#999999' },
+            revenue: { hours: 28, color: '#ff6b9d' },
+            reading: { hours: 10.5, color: '#4CAF50' },
+            makgeollina: { hours: 10, color: '#2196F3' },
+            creative: { hours: 63, color: '#E91E63' },
+        };
+
+        const dayTypes = [
+            { day: 'Mon', type: 'heavy', icon: '⚙️', color: '#ff6b9d' },
+            { day: 'Tue', type: 'mixed', icon: '⚡', color: '#ff9999' },
+            { day: 'Wed', type: 'heavy', icon: '⚙️', color: '#ff6b9d' },
+            { day: 'Thu', type: 'mixed', icon: '✨', color: '#ff9999' },
+            { day: 'Fri', type: 'creative', icon: '🎨', color: '#4CAF50' },
+            { day: 'Sat', type: 'buffer', icon: '🌙', color: '#9C27B0' },
+            { day: 'Sun', type: 'review', icon: '🎯', color: '#4CAF50' },
+        ];
+
+        // YOUR CALENDAR EVENTS (from Google Calendar)
+        const calendarEvents = [
+            { summary: "NERD online meeting", start: "2026-05-18T20:00:00+09:00", end: "2026-05-18T20:50:00+09:00" },
+            { summary: "Treuida filming", start: "2026-05-19T09:00:00+09:00", end: "2026-05-19T13:00:00+09:00" },
+            { summary: "NERD 안국", start: "2026-05-19T14:00:00+09:00", end: "2026-05-19T16:05:00+09:00" },
+            { summary: "NERD online meeting", start: "2026-05-21T21:00:00+09:00", end: "2026-05-21T22:05:00+09:00" },
+            { summary: "친친소 meeting", start: "2026-05-22T12:00:00+09:00", end: "2026-05-22T14:05:00+09:00" },
+            { summary: "개나리 알바", start: "2026-05-23T11:30:00+09:00", end: "2026-05-23T16:35:00+09:00" },
+            { summary: "NERD offline meeting", start: "2026-05-24T19:00:00+09:00", end: "2026-05-24T21:05:00+09:00" },
+            { summary: "개나리 알바", start: "2026-05-24T11:30:00+09:00", end: "2026-05-24T16:35:00+09:00" },
+        ];
+
+        let state = {
+            activeProject: null,
+            focusSeconds: 0,
+            focusRunning: false,
+            motive: "I am building a life of creative freedom and aligned impact.",
+            projectHours: {
+                spotlite: 0,
+                nerd: 0,
+                makgeollina: 0,
+                reading: 0,
+                creative: 0,
+                misc: 0,
+            },
+            projectLogs: {
+                spotlite: [],
+                nerd: [],
+                makgeollina: [],
+                reading: [],
+                creative: [],
+                misc: [],
+            },
+            adhocTasks: [],
+            projectTasks: {
+                spotlite: [],
+                nerd: [],
+                makgeollina: [],
+                reading: [],
+                creative: [],
+                misc: [],
+            },
+            habits: {
+                hotWater: false,
+                thankGod: false,
+                readDavid: false,
+                exercise: { checked: false, type: '', duration: '', reps: '' },
+            },
+            dailyHabits: {
+                // Track habits per day of week: 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
+                Mon: { hotWater: false, thankGod: false, readDavid: false, exercise: false },
+                Tue: { hotWater: false, thankGod: false, readDavid: false, exercise: false },
+                Wed: { hotWater: false, thankGod: false, readDavid: false, exercise: false },
+                Thu: { hotWater: false, thankGod: false, readDavid: false, exercise: false },
+                Fri: { hotWater: false, thankGod: false, readDavid: false, exercise: false },
+                Sat: { hotWater: false, thankGod: false, readDavid: false, exercise: false },
+                Sun: { hotWater: false, thankGod: false, readDavid: false, exercise: false },
+            },
+            customHabits: [],
+            fitnessLog: [],
+            steps: { today: '' },
+            dailyData: {
+                date: new Date().toDateString(),
+                motive: "I am building a life of creative freedom and aligned impact.",
+                projectHours: { spotlite: 0, nerd: 0, makgeollina: 0, reading: 0, creative: 0, misc: 0 },
+                tasksCompleted: [],
+                habitsChecked: []
+            }
+        };
+
+        let focusInterval = null;
+
+        // Load state
+        function loadState() {
+            const saved = localStorage.getItem('amyCountdownDashboard');
+            if (saved) {
+                state = { ...state, ...JSON.parse(saved) };
+            }
+            const lastReset = localStorage.getItem('lastAdhocReset');
+            const today = new Date().toDateString();
+            if (lastReset !== today) {
+                state.adhocTasks = [];
+                localStorage.setItem('lastAdhocReset', today);
+            }
+            document.getElementById('motiveInput').value = state.motive;
+        }
+
+        // Save state
+        function saveState() {
+            localStorage.setItem('amyCountdownDashboard', JSON.stringify(state));
+        }
+
+        // Check if date has changed, reset daily data if so
+        function checkAndResetDailyData() {
+            const today = new Date().toDateString();
+            if (state.dailyData.date !== today) {
+                // Capture motive for today before resetting
+                state.dailyData = {
+                    date: today,
+                    motive: state.motive,
+                    projectHours: { spotlite: 0, nerd: 0, makgeollina: 0, reading: 0, creative: 0, misc: 0 },
+                    tasksCompleted: [],
+                    habitsChecked: []
+                };
+                saveState();
+            }
+        }
+
+        // Update daily data when time is logged
+        function updateDailyData(projectKey, hours) {
+            checkAndResetDailyData();
+            state.dailyData.projectHours[projectKey] = (state.dailyData.projectHours[projectKey] || 0) + hours;
+            saveState();
+        }
+
+        // Render daily report
+        function renderDailyReport() {
+            checkAndResetDailyData();
+
+            // Display motive for today
+            const motiveDiv = document.getElementById('dailyMotive');
+            motiveDiv.textContent = state.dailyData.motive || state.motive;
+
+            // Project cards
+            const projectList = ['spotlite', 'nerd', 'makgeollina', 'reading', 'creative', 'misc'];
+            const cardsDiv = document.getElementById('dailyProjectCards');
+            
+            cardsDiv.innerHTML = projectList.map(projKey => {
+                const proj = projects[projKey];
+                const hours = state.dailyData.projectHours[projKey] || 0;
+                return `
+                    <div style="background: linear-gradient(135deg, ${proj.color}15 0%, ${proj.color}08 100%); border: 2px solid ${proj.color}40; padding: 1.5rem; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 8px; font-weight: 700;">${proj.name}</div>
+                        <div style="font-size: 28px; font-weight: 700; color: ${proj.color};">${hours.toFixed(1)}h</div>
+                    </div>
+                `;
+            }).join('');
+
+            // Time breakdown list
+            const breakdownDiv = document.getElementById('dailyBreakdown');
+            const totalHours = projectList.reduce((sum, pk) => sum + (state.dailyData.projectHours[pk] || 0), 0);
+            
+            if (totalHours === 0) {
+                breakdownDiv.innerHTML = '<div style="color: #999; font-style: italic;">No time logged today yet</div>';
+            } else {
+                breakdownDiv.innerHTML = projectList
+                    .filter(pk => (state.dailyData.projectHours[pk] || 0) > 0)
+                    .map(pk => {
+                        const proj = projects[pk];
+                        const hours = state.dailyData.projectHours[pk];
+                        const percent = ((hours / totalHours) * 100).toFixed(0);
+                        return `
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 600; color: #1a1a1a;">${proj.name}</span>
+                                <span style="font-size: 14px; font-weight: 700; color: ${proj.color};">${hours.toFixed(1)}h (${percent}%)</span>
+                            </div>
+                        `;
+                    })
+                    .join('');
+            }
+
+            // Tasks completed today
+            const tasksDiv = document.getElementById('dailyTasksSummary');
+            const allDailyTasks = projectList
+                .flatMap(pk => (state.projectTasks[pk] || []).map(t => ({ ...t, project: pk })))
+                .filter(t => {
+                    // Simple check: if task was added/completed today
+                    if (!t.id) return false;
+                    const taskDate = new Date(t.id).toDateString();
+                    return taskDate === new Date().toDateString();
+                });
+            
+            const completedTasks = allDailyTasks.filter(t => t.completed);
+            
+            if (allDailyTasks.length === 0) {
+                tasksDiv.innerHTML = '<div style="color: #999; font-style: italic;">No tasks added today</div>';
+            } else {
+                tasksDiv.innerHTML = `
+                    <div style="margin-bottom: 1rem; font-weight: 700; color: #4CAF50;">✓ ${completedTasks.length}/${allDailyTasks.length} tasks completed</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        ${allDailyTasks.map(t => `
+                            <div style="display: flex; align-items: center; gap: 8px; opacity: ${t.completed ? 0.6 : 1}; text-decoration: ${t.completed ? 'line-through' : 'none'};">
+                                <input type="checkbox" ${t.completed ? 'checked' : ''} disabled style="cursor: pointer;">
+                                <span style="flex: 1; font-size: 12px;">${t.name}</span>
+                                ${t.hours > 0 ? `<span style="font-size: 11px; color: #999;">${t.hours}h</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // Habits checked today
+            const habitsDiv = document.getElementById('dailyHabitsSummary');
+            const today = new Date().toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 3);
+            const dayMap = { Mon: 'Mon', Tue: 'Tue', Wed: 'Wed', Thu: 'Thu', Fri: 'Fri', Sat: 'Sat', Sun: 'Sun' };
+            const dayKey = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+            
+            const todayHabits = state.dailyHabits[dayKey] || {};
+            const habitsList = [
+                { emoji: '☕', name: 'Hot water', key: 'hotWater' },
+                { emoji: '🙏', name: 'Thank God', key: 'thankGod' },
+                { emoji: '📖', name: 'Read David', key: 'readDavid' },
+                { emoji: '💪', name: 'Exercise', key: 'exercise' }
+            ];
+
+            const checkedCount = habitsList.filter(h => todayHabits[h.key]).length;
+
+            habitsDiv.innerHTML = `
+                <div style="margin-bottom: 1rem; font-weight: 700; color: #9C27B0;">${checkedCount}/${habitsList.length} habits checked</div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    ${habitsList.map(h => `
+                        <div style="display: flex; align-items: center; gap: 8px; opacity: ${todayHabits[h.key] ? 1 : 0.5};">
+                            <span style="font-size: 16px;">${h.emoji}</span>
+                            <span style="flex: 1; font-size: 12px; ${todayHabits[h.key] ? 'color: #9C27B0; font-weight: 600;' : ''}">${h.name}</span>
+                            ${todayHabits[h.key] ? '<span style="color: #9C27B0; font-weight: 700;">✓</span>' : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Archive daily data (called at end of day)
+        function archiveDailyData() {
+            if (confirm('End day and archive today\'s data?\n\nThis will:\n✓ Save today\'s summary\n✓ Reset for tomorrow\n\nProceed?')) {
+                checkAndResetDailyData();
+                alert('📊 Today\'s data archived! New day started.');
+                renderDailyReport();
+            }
+        }
+
+        // Render weekly cumulative report
+        function renderWeeklyReport() {
+            const reportDiv = document.getElementById('reportSummaries');
+            const projectList = ['spotlite', 'nerd', 'makgeollina', 'reading', 'creative', 'misc'];
+            
+            reportDiv.innerHTML = projectList.map(projKey => {
+                const proj = projects[projKey];
+                const hours = state.projectHours[projKey] || 0;
+                const tasks = state.projectTasks[projKey] || [];
+                const completedTasks = tasks.filter(t => t.completed);
+                const totalTaskHours = tasks.reduce((sum, t) => sum + (t.hours || 0), 0);
+                const completedTaskHours = completedTasks.reduce((sum, t) => sum + (t.hours || 0), 0);
+
+                return `
+                    <div style="background: linear-gradient(135deg, ${proj.color}10 0%, ${proj.color}05 100%); border: 2px solid ${proj.color}40; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                        <div style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; color: ${proj.color};">${proj.name}</div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                            <div style="background: white; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid ${proj.color}40;">
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 4px;">Hours logged</div>
+                                <div style="font-size: 24px; font-weight: 700; color: ${proj.color};">${hours.toFixed(1)}h</div>
+                            </div>
+                            <div style="background: white; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid ${proj.color}40;">
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 4px;">Tasks done</div>
+                                <div style="font-size: 24px; font-weight: 700; color: ${proj.color};">${completedTasks.length}/${tasks.length}</div>
+                            </div>
+                            <div style="background: white; padding: 12px; border-radius: 8px; text-align: center; border: 1px solid ${proj.color}40;">
+                                <div style="font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 4px;">Task hours</div>
+                                <div style="font-size: 24px; font-weight: 700; color: ${proj.color};">${completedTaskHours.toFixed(1)}/${totalTaskHours.toFixed(1)}h</div>
+                            </div>
+                        </div>
+
+                        ${tasks.length > 0 ? `
+                            <div style="border-top: 1px solid ${proj.color}40; padding-top: 1rem;">
+                                <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #888; margin-bottom: 0.5rem;">Tasks completed:</div>
+                                <div style="font-size: 12px; line-height: 1.6;">
+                                    ${tasks.map(task => `
+                                        <div style="opacity: ${task.completed ? 1 : 0.5}; text-decoration: ${task.completed ? 'line-through' : 'none'}; color: #1a1a1a; margin-bottom: 4px;">
+                                            ${task.completed ? '✓' : '○'} ${task.name}${task.hours > 0 ? ' (' + task.hours + 'h)' : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        function resetWeeklyData() {
+            const confirmed = confirm('🔄 Ready to reset for next week?\n\nThis will clear:\n✓ Project hours\n✓ Project tasks\n✓ Fitness logs\n✓ Steps\n\nKept:\n✓ Habits & custom habits\n\nProceed?');
+            
+            if (confirmed) {
+                state.projectHours = { spotlite: 0, nerd: 0, makgeollina: 0, reading: 0, creative: 0, misc: 0 };
+                state.projectTasks = { spotlite: [], nerd: [], makgeollina: [], reading: [], creative: [], misc: [] };
+                state.fitnessLog = [];
+                state.steps = { today: '' };
+                document.getElementById('stepDisplay').textContent = '0';
+                document.getElementById('progressFill').style.width = '0%';
+                saveState();
+                renderWeeklyReport();
+                alert('✓ Weekly data reset! New week starts now.');
+            }
+        }
+
+        // Save motive
+        function saveMotive() {
+            state.motive = document.getElementById('motiveInput').value;
+            saveState();
+        }
+
+        // Format time
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        // Calculate blocked time
+        function getBlockedTimeToday() {
+            const now = new Date();
+            const today = now.toDateString();
+            let totalMinutes = 0;
+            let eventsList = [];
+
+            calendarEvents.forEach(event => {
+                const eventDate = new Date(event.start).toDateString();
+                if (eventDate === today) {
+                    const start = new Date(event.start);
+                    const end = new Date(event.end);
+                    const minutes = (end - start) / (1000 * 60);
+                    totalMinutes += minutes;
+                    const time = start.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    eventsList.push(`${event.summary} ${time}`);
+                }
+            });
+
+            return { minutes: totalMinutes, events: eventsList };
+        }
+
+        // Calculate sleep countdown
+        function calculateSleepCountdown() {
+            const now = new Date();
+            const bedtime = new Date();
+            bedtime.setHours(1, 30, 0);
+            if (now > bedtime) {
+                bedtime.setDate(bedtime.getDate() + 1);
+            }
+            const diff = bedtime - now;
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            return `${hours}h ${minutes}m`;
+        }
+
+        // Update header
+        function updateHeader() {
+            const now = new Date();
+            document.getElementById('dateDisplay').textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) + ' • ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            const blocked = getBlockedTimeToday();
+            const freeHours = 24 - 7 - (blocked.minutes / 60); // 24 - 7 sleep - blocked time
+            const hoursDisplay = Math.round(freeHours);
+            
+            document.getElementById('hoursLeft').textContent = hoursDisplay + 'h';
+            
+            // Update blocked time display
+            if (blocked.minutes > 0) {
+                const hours = Math.floor(blocked.minutes / 60);
+                const mins = blocked.minutes % 60;
+                const timeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+                const firstEvent = blocked.events[0].split(' ').slice(0, 2).join(' ');
+                document.getElementById('blockedTimeDetail').textContent = `${timeStr} (${firstEvent})`;
+            } else {
+                document.getElementById('blockedTimeDetail').textContent = 'No blocks';
+            }
+            
+            document.getElementById('sleepCountdown').textContent = calculateSleepCountdown();
+            document.getElementById('lastUpdated').textContent = now.toLocaleString();
+            
+            // Update progress bar
+            updateDailyProgressBar();
+        }
+
+        // Update daily progress bar
+        function updateDailyProgressBar() {
+            const categories = [
+                { name: 'Sleep', hours: 7, color: '#999999', key: 'sleep' },
+                { name: 'Spotlite', hours: state.projectHours.spotlite, color: '#9C27B0', key: 'spotlite' },
+                { name: 'NERD', hours: state.projectHours.nerd, color: '#FF9800', key: 'nerd' },
+                { name: 'Reading', hours: state.projectHours.reading, color: '#4CAF50', key: 'reading' },
+                { name: '@makgeollina', hours: state.projectHours.makgeollina, color: '#2196F3', key: 'makgeollina' },
+                { name: 'Creative', hours: state.projectHours.creative, color: '#E91E63', key: 'creative' },
+                { name: 'Misc', hours: state.projectHours.misc, color: '#999999', key: 'misc' },
+                { name: 'Life', hours: 24 - 7 - (state.projectHours.spotlite + state.projectHours.nerd + state.projectHours.reading + state.projectHours.makgeollina + state.projectHours.creative + state.projectHours.misc) - getBlockedTimeToday().minutes / 60, color: '#ff6b9d', key: 'life' },
+            ];
+
+            const totalHours = 24;
+            const bar = document.getElementById('dailyProgressBar');
+            const legend = document.getElementById('progressLegend');
+
+            bar.innerHTML = '';
+            legend.innerHTML = '';
+
+            categories.forEach(cat => {
+                if (cat.hours > 0) {
+                    const percentage = (cat.hours / totalHours) * 100;
+                    const segment = document.createElement('div');
+                    segment.className = 'progress-segment';
+                    segment.style.background = cat.color;
+                    segment.style.flex = percentage;
+                    segment.innerHTML = `<span class="progress-segment-label">${cat.hours.toFixed(1)}h</span>`;
+                    bar.appendChild(segment);
+
+                    const legendItem = document.createElement('div');
+                    legendItem.className = 'legend-item';
+                    legendItem.innerHTML = `
+                        <div class="legend-color" style="background: ${cat.color};"></div>
+                        <span>${cat.name}: ${cat.hours.toFixed(1)}h</span>
+                    `;
+                    legend.appendChild(legendItem);
+                }
+            });
+        }
+
+        // Render allocations with LIVE COUNTDOWN
+        function renderAllocations() {
+            const grid = document.getElementById('allocationsGrid');
+            grid.innerHTML = Object.entries(allocations).map(([key, data]) => {
+                // Calculate remaining hours based on state
+                let remaining = data.hours;
+                if (key === 'revenue') {
+                    remaining = data.hours - (state.projectHours.spotlite + state.projectHours.nerd);
+                } else if (key === 'reading') {
+                    remaining = data.hours - state.projectHours.reading;
+                } else if (key === 'makgeollina') {
+                    remaining = data.hours - state.projectHours.makgeollina;
+                } else if (key === 'creative') {
+                    remaining = data.hours - state.projectHours.creative;
+                }
+                
+                const label = key === 'sleep' ? 'sleep (locked)' : key === 'revenue' ? 'revenue (locked)' : key;
+                const icon = { sleep: '😴', revenue: '💼', reading: '📖', makgeollina: '🎬', creative: '🎨' }[key];
+                const displayHours = key === 'revenue' || key === 'sleep' ? data.hours : Math.max(0, remaining).toFixed(1);
+                
+                return `
+                    <div class="allocation-card" style="background: linear-gradient(135deg, ${data.color}10 0%, ${data.color}05 100%); border-color: ${data.color}; box-shadow: 0 4px 6px ${data.color}20;">
+                        <div class="allocation-label">${icon} ${label}</div>
+                        <div class="allocation-hours">${displayHours}h</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render week grid
+        function renderWeekGrid() {
+            const grid = document.getElementById('weekGrid');
+            grid.innerHTML = dayTypes.map(d => `
+                <div class="day-card" style="background: linear-gradient(135deg, ${d.color}15 0%, ${d.color}08 100%); border-color: ${d.color}40;">
+                    <div class="day-label">${d.day}</div>
+                    <div class="day-icon">${d.icon}</div>
+                    <div class="day-type">${d.type}</div>
+                </div>
+            `).join('');
+        }
+
+        // Render expanded week grid with habits and blocks
+        function renderWeekGridWithDetails() {
+            const grid = document.getElementById('weekGridWithDetails');
+            
+            grid.innerHTML = dayTypes.map((d, index) => {
+                // Get blocks for this day
+                const today = new Date();
+                const dayDate = new Date(today);
+                dayDate.setDate(dayDate.getDate() - today.getDay() + 1 + index); // Monday is start
+                const dayString = dayDate.toDateString();
+                
+                const blocksForDay = calendarEvents.filter(event => {
+                    const eventDate = new Date(event.start).toDateString();
+                    return eventDate === dayString;
+                });
+
+                // Get habits for this day
+                const habitsList = [
+                    { emoji: '☕', name: 'Hot water', key: 'hotWater' },
+                    { emoji: '🙏', name: 'Thank God', key: 'thankGod' },
+                    { emoji: '📖', name: 'Read David', key: 'readDavid' },
+                    { emoji: '💪', name: 'Exercise', key: 'exercise' },
+                ];
+
+                return `
+                    <div class="expanded-day-card" style="background: linear-gradient(135deg, ${d.color}15 0%, ${d.color}08 100%); border-color: ${d.color}40;">
+                        <div class="day-header">${d.day}</div>
+                        <div class="day-icon">${d.icon}</div>
+                        <div class="day-type">${d.type}</div>
+                        
+                        <div class="day-habits">
+                            <div style="font-size: 9px; font-weight: 700; color: #888; margin-bottom: 6px; text-transform: uppercase;">Habits</div>
+                            ${habitsList.map(h => `
+                                <div class="habit-item" onclick="toggleDailyHabit('${h.key}', ${index})">
+                                    <input type="checkbox" class="habit-checkbox-small" ${state.dailyHabits[d.day][h.key] ? 'checked' : ''}>
+                                    <span class="habit-label-small">${h.emoji} ${h.name}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        ${blocksForDay.length > 0 ? `
+                            <div class="day-blocks">
+                                <div style="font-size: 9px; font-weight: 700; color: #ff6b9d; margin-bottom: 6px; text-transform: uppercase;">Blocks</div>
+                                ${blocksForDay.map(block => {
+                                    const start = new Date(block.start);
+                                    const end = new Date(block.end);
+                                    const duration = (end - start) / (1000 * 60);
+                                    const hours = Math.floor(duration / 60);
+                                    const mins = duration % 60;
+                                    const timeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+                                    const timeDisplay = start.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                                    return `
+                                        <div class="block-item">
+                                            ${block.summary}
+                                            <div class="block-time">${timeDisplay} (${timeStr})</div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleDailyHabit(habitKey, dayIndex) {
+            const dayName = dayTypes[dayIndex].day;
+            if (!state.dailyHabits[dayName]) {
+                state.dailyHabits[dayName] = {};
+            }
+            state.dailyHabits[dayName][habitKey] = !state.dailyHabits[dayName][habitKey];
+            renderWeekGridWithDetails();
+            saveState();
+        }
+
+        // Render steps week
+        function renderStepsWeekGrid() {
+            const grid = document.getElementById('stepsWeekGrid');
+            grid.innerHTML = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => `
+                <div class="day-card" style="background: rgba(76, 175, 80, 0.1); border-color: rgba(76, 175, 80, 0.3);">
+                    <div class="day-label">${day}</div>
+                    <div class="day-icon">—</div>
+                    <div class="day-type">steps</div>
+                </div>
+            `).join('');
+        }
+
+        // Sidebar
+        function renderSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.innerHTML = Object.entries(projects).map(([key, proj]) => {
+                const remaining = Math.max(0, proj.target - state.projectHours[key]);
+                const isActive = state.activeProject === key;
+                return `
+                    <div class="project-selector ${isActive ? 'active' : ''}" style="--color: ${proj.color};" onclick="selectProject('${key}')">
+                        <div>${proj.name}</div>
+                        <div class="project-hours">Remaining</div>
+                        <div class="project-hours-value">${remaining.toFixed(1)}h</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectProject(key) {
+            state.activeProject = key;
+            state.focusSeconds = 0;
+            document.getElementById('focusTag').value = '';
+            updateFocusPanel();
+            saveState();
+        }
+
+        function updateFocusPanel() {
+            if (!state.activeProject) {
+                document.getElementById('focusProjectName').textContent = 'Select a project';
+                document.getElementById('focusTimer').textContent = '--:--:--';
+                document.getElementById('activeProjectTasksTitle').textContent = 'Select a project to add tasks';
+                document.getElementById('activeProjectTasksList').innerHTML = '';
+                document.getElementById('focusPlayBtn').style.display = 'block';
+                document.getElementById('focusStopBtn').style.display = 'none';
+                document.getElementById('focusLogBtn').style.display = 'none';
+                return;
+            }
+
+            const proj = projects[state.activeProject];
+            document.getElementById('focusProjectName').textContent = proj.name;
+            document.getElementById('focusTimer').textContent = formatTime(state.focusSeconds);
+            document.getElementById('focusPanel').style.borderColor = proj.color;
+            
+            // Update active project tasks display
+            document.getElementById('activeProjectTasksTitle').textContent = `📋 ${proj.name} tasks`;
+            renderProjectTasks(state.activeProject);
+            
+            const playBtn = document.getElementById('focusPlayBtn');
+            const pauseBtn = document.getElementById('focusStopBtn');
+            const logBtn = document.getElementById('focusLogBtn');
+            
+            if (state.focusRunning) {
+                // Timer is running - show Pause
+                playBtn.style.display = 'none';
+                pauseBtn.style.display = 'block';
+                logBtn.style.display = 'none';
+            } else if (state.focusSeconds > 0) {
+                // Timer is paused with time - show Log button
+                playBtn.style.display = 'block';
+                pauseBtn.style.display = 'none';
+                logBtn.style.display = 'block';
+            } else {
+                // Timer is at 0 - show Start
+                playBtn.style.display = 'block';
+                pauseBtn.style.display = 'none';
+                logBtn.style.display = 'none';
+            }
+        }
+
+        function toggleFocusTimer() {
+            if (!state.activeProject) {
+                alert('Please select a project first');
+                return;
+            }
+
+            // Clear any existing interval first
+            if (focusInterval) {
+                clearInterval(focusInterval);
+                focusInterval = null;
+            }
+
+            state.focusRunning = !state.focusRunning;
+
+            if (state.focusRunning) {
+                // Start new interval
+                focusInterval = setInterval(() => {
+                    state.focusSeconds++;
+                    document.getElementById('focusTimer').textContent = formatTime(state.focusSeconds);
+                    updateHeader();
+                    renderSidebar();
+                }, 1000);
+            } else {
+                // Timer paused - stop the interval
+                focusInterval = null;
+            }
+
+            updateFocusPanel();
+            saveState();
+        }
+
+        function pauseFocusTimer() {
+            // Just pause - don't save yet
+            if (focusInterval) {
+                clearInterval(focusInterval);
+                focusInterval = null;
+            }
+            state.focusRunning = false;
+            updateFocusPanel();
+            saveState();
+        }
+
+        function logFocusTime() {
+            if (!state.activeProject || state.focusSeconds === 0) {
+                alert('No time to log');
+                return;
+            }
+
+            // Clear interval if still running
+            if (focusInterval) {
+                clearInterval(focusInterval);
+                focusInterval = null;
+            }
+
+            const tag = document.getElementById('focusTag').value || 'Untagged';
+            const hours = state.focusSeconds / 3600;
+
+            state.projectHours[state.activeProject] += hours;
+            updateDailyData(state.activeProject, hours);
+            state.projectLogs[state.activeProject].push({
+                tag,
+                hours,
+                timestamp: new Date().toLocaleString()
+            });
+
+            state.focusSeconds = 0;
+            state.focusRunning = false;
+            document.getElementById('focusTag').value = '';
+
+            updateFocusPanel();
+            updateHeader();
+            renderSidebar();
+            renderAllocations();
+            updateDailyProgressBar();
+            renderDailyReport();
+            renderWeeklyReport();
+            saveState();
+        }
+
+        // Manual time logging
+        function logTimeManually() {
+            const projectSelect = document.getElementById('manualProjectSelect');
+            const hoursInput = document.getElementById('manualHoursInput');
+            const tagInput = document.getElementById('manualTagInput');
+            
+            const projectKey = projectSelect.value;
+            const hours = parseFloat(hoursInput.value);
+            const tag = tagInput.value || 'Manual entry';
+
+            if (!projectKey) {
+                alert('Please select a project');
+                return;
+            }
+
+            if (hours <= 0) {
+                alert('Please enter hours > 0');
+                return;
+            }
+
+            // Add to project hours
+            state.projectHours[projectKey] += hours;
+            updateDailyData(projectKey, hours);
+            state.projectLogs[projectKey].push({
+                tag,
+                hours,
+                timestamp: new Date().toLocaleString()
+            });
+
+            // Clear inputs
+            projectSelect.value = '';
+            hoursInput.value = '1';
+            tagInput.value = '';
+
+            // Update display
+            updateHeader();
+            renderSidebar();
+            renderAllocations();
+            updateDailyProgressBar();
+            renderDailyReport();
+            saveState();
+            
+            alert(`✓ Logged ${hours}h to ${projects[projectKey].name}`);
+        }
+
+        // Per-project task management
+        function addProjectTask() {
+            if (!state.activeProject) {
+                alert('Please select a project first');
+                return;
+            }
+
+            const taskInput = document.getElementById('taskInput');
+            const hoursInput = document.getElementById('taskHours');
+            const taskName = taskInput.value.trim();
+            const hours = parseFloat(hoursInput.value) || 0;
+
+            if (!taskName) {
+                alert('Please enter a task name');
+                return;
+            }
+
+            state.projectTasks[state.activeProject].push({
+                id: Date.now(),
+                name: taskName,
+                hours,
+                completed: false
+            });
+
+            taskInput.value = '';
+            hoursInput.value = '1';
+            renderProjectTasks(state.activeProject);
+            saveState();
+        }
+
+        function toggleProjectTask(taskId) {
+            if (!state.activeProject) return;
+            
+            const task = state.projectTasks[state.activeProject].find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                renderProjectTasks(state.activeProject);
+                saveState();
+            }
+        }
+
+        function renderProjectTasks(projectKey) {
+            const list = document.getElementById('activeProjectTasksList');
+            const tasks = state.projectTasks[projectKey] || [];
+
+            if (tasks.length === 0) {
+                list.innerHTML = `
+                    <div class="adhoc-input-group" style="margin-bottom: 1rem;">
+                        <input type="text" class="adhoc-input" id="taskInput" placeholder="Add a task">
+                        <input type="number" step="0.5" class="adhoc-hours-input" id="taskHours" placeholder="hrs" value="1">
+                    </div>
+                    <button class="adhoc-add-btn" onclick="addProjectTask()">+ Add</button>
+                    <div style="font-size: 11px; color: #999; text-align: center; padding: 1rem;">No tasks yet</div>
+                `;
+                return;
+            }
+
+            list.innerHTML = `
+                <div class="adhoc-input-group" style="margin-bottom: 1rem;">
+                    <input type="text" class="adhoc-input" id="taskInput" placeholder="Add a task">
+                    <input type="number" step="0.5" class="adhoc-hours-input" id="taskHours" placeholder="hrs" value="1">
+                </div>
+                <button class="adhoc-add-btn" onclick="addProjectTask()">+ Add</button>
+                <div class="adhoc-tasks" style="margin-top: 1rem;">
+                    ${tasks.map(task => `
+                        <div class="adhoc-task" onclick="toggleProjectTask(${task.id})" style="opacity: ${task.completed ? 0.5 : 1}; text-decoration: ${task.completed ? 'line-through' : 'none'};">
+                            <div>
+                                <input type="checkbox" ${task.completed ? 'checked' : ''} style="margin-right: 8px;">
+                                <span class="adhoc-task-name">${task.name}</span>
+                            </div>
+                            <div class="adhoc-task-hours" style="opacity: ${task.hours > 0 ? 1 : 0.5}">${task.hours > 0 ? task.hours + 'h' : '—'}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Ad-hoc tasks
+        function addAdhocTask() {
+            const taskInput = document.getElementById('adhocTaskInput');
+            const hoursInput = document.getElementById('adhocHoursInput');
+            const taskName = taskInput.value.trim();
+            const hours = parseFloat(hoursInput.value) || 1;
+
+            if (!taskName) {
+                alert('Please enter a task name');
+                return;
+            }
+
+            state.adhocTasks.push({
+                id: Date.now(),
+                name: taskName,
+                hours,
+                completed: false
+            });
+
+            taskInput.value = '';
+            hoursInput.value = '1';
+            renderAdhocTasks();
+            saveState();
+        }
+
+        function renderAdhocTasks() {
+            const list = document.getElementById('adhocTasksList');
+            if (state.adhocTasks.length === 0) {
+                list.innerHTML = '<div style="font-size: 11px; color: #999; text-align: center; padding: 1rem;">No tasks added yet</div>';
+                return;
+            }
+
+            list.innerHTML = state.adhocTasks.map(task => `
+                <div class="adhoc-task" onclick="toggleAdhocTask(${task.id})" style="opacity: ${task.completed ? 0.5 : 1}; text-decoration: ${task.completed ? 'line-through' : 'none'};">
+                    <div>
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} style="margin-right: 8px;">
+                        <span class="adhoc-task-name">${task.name}</span>
+                    </div>
+                    <div class="adhoc-task-hours">${task.hours}h</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleAdhocTask(id) {
+            const task = state.adhocTasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                renderAdhocTasks();
+                saveState();
+            }
+        }
+
+        // Habits
+        function renderHabits() {
+            const grid = document.getElementById('habitsGrid');
+            grid.innerHTML = `
+                <div class="habit-card ${state.habits.hotWater ? 'checked' : ''}" onclick="toggleHabit('hotWater')">
+                    <input type="checkbox" class="habit-checkbox" ${state.habits.hotWater ? 'checked' : ''}>
+                    <div class="habit-name">☕ Hot water</div>
+                    <div class="habit-desc">Upon waking</div>
+                </div>
+
+                <div class="habit-card ${state.habits.thankGod ? 'checked' : ''}" onclick="toggleHabit('thankGod')">
+                    <input type="checkbox" class="habit-checkbox" ${state.habits.thankGod ? 'checked' : ''}>
+                    <div class="habit-name">🙏 Thank God</div>
+                    <div class="habit-desc">Gratitude moment</div>
+                </div>
+
+                <div class="habit-card ${state.habits.readDavid ? 'checked' : ''}" onclick="toggleHabit('readDavid')">
+                    <input type="checkbox" class="habit-checkbox" ${state.habits.readDavid ? 'checked' : ''}>
+                    <div class="habit-name">📖 Read David</div>
+                    <div class="habit-desc">Bible reading</div>
+                </div>
+
+                <div class="habit-card ${state.habits.exercise.checked ? 'checked' : ''}" onclick="toggleHabit('exercise')">
+                    <input type="checkbox" class="habit-checkbox" ${state.habits.exercise.checked ? 'checked' : ''}>
+                    <div class="habit-name">💪 Exercise 30+</div>
+                    <div class="habit-desc">Movement time</div>
+                    ${state.habits.exercise.checked ? `
+                        <div class="exercise-fields">
+                            <input type="text" class="exercise-input" placeholder="Type" value="${state.habits.exercise.type}" onchange="updateExercise('type', this.value)">
+                            <input type="text" class="exercise-input" placeholder="Mins" value="${state.habits.exercise.duration}" onchange="updateExercise('duration', this.value)">
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function toggleHabit(habit) {
+            if (habit === 'exercise') {
+                state.habits.exercise.checked = !state.habits.exercise.checked;
+            } else {
+                state.habits[habit] = !state.habits[habit];
+            }
+            renderHabits();
+            saveState();
+        }
+
+        function updateExercise(field, value) {
+            state.habits.exercise[field] = value;
+            saveState();
+        }
+
+        // Custom habits
+        function addCustomHabit() {
+            const nameInput = document.getElementById('newHabitName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                alert('Please enter a habit name');
+                return;
+            }
+
+            const dayCheckboxes = document.querySelectorAll('.day-checkbox:checked');
+            const days = Array.from(dayCheckboxes).map(cb => cb.value);
+
+            if (days.length === 0) {
+                alert('Please select at least one day');
+                return;
+            }
+
+            const habit = {
+                id: Date.now(),
+                name,
+                days,
+                emoji: '⭐'
+            };
+
+            state.customHabits.push(habit);
+            nameInput.value = '';
+            document.querySelectorAll('.day-checkbox').forEach(cb => cb.checked = false);
+            renderCustomHabits();
+            renderWeekGridWithDetails();
+            saveState();
+        }
+
+        function renderCustomHabits() {
+            const grid = document.getElementById('customHabitsGrid');
+            if (state.customHabits.length === 0) {
+                grid.innerHTML = '<div style="font-size: 11px; color: #999; text-align: center; padding: 2rem;">No custom habits yet</div>';
+                return;
+            }
+
+            grid.innerHTML = state.customHabits.map(habit => `
+                <div class="habit-card" style="border-color: #ff9800;">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">${habit.emoji} ${habit.name}</div>
+                    <div style="font-size: 10px; color: #999; margin-bottom: 1rem;">Repeats: ${habit.days.join(', ')}</div>
+                    <button onclick="deleteCustomHabit(${habit.id})" style="background: #ff9800; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 10px; cursor: pointer; width: 100%;">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteCustomHabit(habitId) {
+            state.customHabits = state.customHabits.filter(h => h.id !== habitId);
+            renderCustomHabits();
+            renderWeekGridWithDetails();
+            saveState();
+        }
+
+        // Exercise logging
+        function addExerciseLog() {
+            const exerciseName = document.getElementById('exerciseName').value.trim();
+            const exerciseReps = document.getElementById('exerciseReps').value.trim();
+            const exerciseUnit = document.getElementById('exerciseUnit').value;
+
+            if (!exerciseName) {
+                alert('Please enter an exercise name');
+                return;
+            }
+
+            if (!state.fitnessLog) {
+                state.fitnessLog = [];
+            }
+
+            // Auto-timestamp
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+            state.fitnessLog.push({
+                type: 'exercise',
+                time,
+                exercise: exerciseName,
+                amount: exerciseReps || '—',
+                unit: exerciseUnit || '—',
+                timestamp: now
+            });
+
+            document.getElementById('exerciseName').value = '';
+            document.getElementById('exerciseReps').value = '';
+            renderFitnessLog();
+            saveState();
+        }
+
+        // Food logging
+        function addFoodLog() {
+            const foodName = document.getElementById('foodName').value.trim();
+
+            if (!foodName) {
+                alert('Please enter food/meal');
+                return;
+            }
+
+            if (!state.fitnessLog) {
+                state.fitnessLog = [];
+            }
+
+            // Auto-timestamp
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+            state.fitnessLog.push({
+                type: 'food',
+                time,
+                food: foodName,
+                timestamp: now
+            });
+
+            document.getElementById('foodName').value = '';
+            renderFitnessLog();
+            saveState();
+        }
+
+        function renderFitnessLog() {
+            const display = document.getElementById('fitnessLogDisplay');
+            const logs = state.fitnessLog || [];
+
+            if (logs.length === 0) {
+                display.innerHTML = '<div style="font-size: 11px; color: #999; text-align: center; padding: 2rem;">No entries yet</div>';
+                return;
+            }
+
+            // Sort logs by timestamp (newest first)
+            const sortedLogs = [...logs].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            display.innerHTML = sortedLogs.map((log, idx) => {
+                if (log.type === 'exercise') {
+                    return `
+                        <div style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%); border: 1px solid rgba(76, 175, 80, 0.2); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px;">
+                                <input type="time" value="${log.time.replace(/[^\d:]/g, '').slice(0, 5)}" onchange="updateExerciseTime('${log.timestamp}', this.value)" style="background: transparent; border: none; font-weight: 700; color: #4CAF50; font-size: 12px; cursor: pointer; padding: 0;">
+                                <button onclick="deleteFitnessLog('${log.timestamp}')" style="background: #ff6b9d; color: white; border: none; padding: 2px 8px; border-radius: 3px; font-size: 9px; cursor: pointer;">×</button>
+                            </div>
+                            <div style="font-size: 12px; color: #1a1a1a; font-weight: 600;">${log.exercise} × ${log.amount} ${log.unit}</div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div style="background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(255, 107, 157, 0.05) 100%); border: 1px solid rgba(255, 107, 157, 0.2); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px;">
+                                <input type="time" value="${log.time.replace(/[^\d:]/g, '').slice(0, 5)}" onchange="updateFoodTime('${log.timestamp}', this.value)" style="background: transparent; border: none; font-weight: 700; color: #ff6b9d; font-size: 12px; cursor: pointer; padding: 0;">
+                                <button onclick="deleteFitnessLog('${log.timestamp}')" style="background: #ff6b9d; color: white; border: none; padding: 2px 8px; border-radius: 3px; font-size: 9px; cursor: pointer;">×</button>
+                            </div>
+                            <div style="font-size: 12px; color: #1a1a1a;">${log.food}</div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        function updateExerciseTime(timestamp, newTime) {
+            const log = state.fitnessLog.find(l => l.timestamp === timestamp);
+            if (log && newTime) {
+                log.time = newTime;
+                renderFitnessLog();
+                saveState();
+            }
+        }
+
+        function updateFoodTime(timestamp, newTime) {
+            const log = state.fitnessLog.find(l => l.timestamp === timestamp);
+            if (log && newTime) {
+                log.time = newTime;
+                renderFitnessLog();
+                saveState();
+            }
+        }
+
+        function deleteFitnessLog(timestamp) {
+            state.fitnessLog = state.fitnessLog.filter(log => log.timestamp !== timestamp);
+            renderFitnessLog();
+            saveState();
+        }
+
+        // Fitness
+        function logSteps() {
+            const input = document.getElementById('stepInput');
+            const steps = parseInt(input.value);
+            if (steps > 0) {
+                state.steps.today = steps;
+                const progress = Math.min((steps / 10000) * 100, 100);
+                document.getElementById('progressFill').style.width = progress + '%';
+                document.getElementById('stepDisplay').textContent = steps.toLocaleString();
+                input.value = '';
+                saveState();
+            }
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Initialize
+        loadState();
+        updateHeader();
+        renderAllocations();
+        renderWeekGridWithDetails(); // Render expanded week grid instead
+        renderSidebar();
+        renderHabits();
+        renderAdhocTasks();
+        renderStepsWeekGrid();
+        renderCustomHabits();
+        renderFitnessLog();
+        renderDailyReport();
+        renderWeeklyReport();
+        updateDailyProgressBar(); // Render progress bar on load
+        
+        const stepsVal = parseInt(state.steps.today) || 0;
+        document.getElementById('stepDisplay').textContent = stepsVal.toLocaleString();
+        if (stepsVal > 0) {
+            document.getElementById('progressFill').style.width = Math.min((stepsVal / 10000) * 100, 100) + '%';
+        }
+        setInterval(updateHeader, 60000);
+    </script>
+</body>
+</html>
