@@ -88,6 +88,11 @@
             line-height: 1.3;
         }
         
+        .blocked-time-empty {
+            color: #999;
+            font-size: 9px;
+        }
+        
         .sleep-stat {
             text-align: center;
             min-width: 90px;
@@ -904,12 +909,47 @@
     </div>
 
     <script>
-        const projects = {
+        const calendarEvents = {
+            'Mon May 18': [],
+            'Tue May 19': [
+                { name: 'Treuida filming', time: '9:00 AM - 1:00 PM' },
+                { name: 'NERD 안국', time: '2:00 - 4:05 PM' }
+            ],
+            'Wed May 20': [],
+            'Thu May 21': [
+                { name: 'NERD online meeting', time: '9:00 - 10:05 PM' }
+            ],
+            'Fri May 22': [
+                { name: '친친소 meeting', time: '12:00 - 2:05 PM' }
+            ],
+            'Sat May 23': [
+                { name: '개나리 알바', time: '11:30 AM - 4:35 PM' }
+            ],
+            'Sun May 24': [
+                { name: '개나리 알바', time: '11:30 AM - 4:35 PM' },
+                { name: 'NERD offline meeting', time: '9:30 - 11:35 PM' }
+            ]
+        };
+
+        function getBlockedTimeDisplay() {
+            const now = new Date();
+            const dayFormat = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            const events = calendarEvents[dayFormat] || [];
+            
+            if (events.length === 0) {
+                return '<div class="blocked-time-title">Blocked time</div><div class="blocked-time-empty">No events today</div>';
+            }
+
+            return `
+                <div class="blocked-time-title">Blocked time</div>
+                ${events.map(e => `<div class="blocked-time-detail">${e.name}<br>${e.time}</div>`).join('')}
+            `;
+        }
             spotlite: { name: 'Spotlite', color: '#9C27B0', allocation: 12 },
             nerd: { name: 'NERD', color: '#FF9800', allocation: 10 },
             makgeollina: { name: '@makgeollina_ipo', color: '#2196F3', allocation: 10 },
             reading: { name: 'Reading', color: '#4CAF50', allocation: 10.5 },
-            creative: { name: 'Creative Block', color: '#E91E63', allocation: 63 },
+            creative: { name: 'Creative Block', color: '#E91E63', allocation: 60 },
             misc: { name: 'Misc', color: '#999999', allocation: 0 }
         };
 
@@ -1107,9 +1147,18 @@
             const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
             document.getElementById('headerTime').textContent = timeStr;
 
+            // Calculate elapsed time this week
+            const weekStart = new Date(now);
+            weekStart.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
+            weekStart.setHours(0, 0, 0, 0);
+            
+            const elapsedMs = now - weekStart;
+            const elapsedHours = elapsedMs / (1000 * 60 * 60);
+
+            // Total available = 119h (168h - 49h sleep)
+            const totalAvailable = 119;
             const totalLogged = Object.values(state.projectHours).reduce((a, b) => a + b, 0);
-            const totalAllocation = Object.values(projects).reduce((sum, p) => sum + p.allocation, 0);
-            const freeTime = Math.max(0, totalAllocation - totalLogged);
+            const freeTime = Math.max(0, totalAvailable - elapsedHours - totalLogged);
             document.getElementById('freeTime').textContent = freeTime.toFixed(1) + 'h';
 
             const sleepHours = 7;
@@ -1117,6 +1166,9 @@
             const sleepTarget = new Date(now.getTime() + sleepMs);
             const sleepTime = sleepTarget.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
             document.getElementById('sleepCountdown').textContent = sleepTime;
+
+            // Update blocked time display
+            document.getElementById('blockedTimeDisplay').innerHTML = getBlockedTimeDisplay();
         }
 
         function updateDailyProgressBar() {
@@ -1170,9 +1222,11 @@
             const sidebar = document.getElementById('sidebar');
             sidebar.innerHTML = Object.entries(projects).map(([key, proj]) => {
                 const isActive = state.activeProject === key;
+                const remaining = proj.allocation - (state.projectHours[key] || 0);
                 return `
                     <div class="project-switcher ${isActive ? 'active' : ''}" onclick="selectProject('${key}')" style="border-color: ${proj.color}; color: #1a1a1a;">
-                        ${proj.name}
+                        <div style="font-weight: 700; font-size: 12px;">${proj.name}</div>
+                        <div style="font-size: 10px; color: #999; margin-top: 4px;">${Math.max(0, remaining).toFixed(1)}h left</div>
                     </div>
                 `;
             }).join('');
