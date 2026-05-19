@@ -1180,12 +1180,34 @@
             const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
             document.getElementById('headerTime').textContent = timeStr;
 
-            // Calculate elapsed time this week (Sunday 0:00 AM = start of week)
-            const weekStart = new Date(now);
-            weekStart.setDate(now.getDate() - now.getDay());
+            // Calculate elapsed time this week using Korea timezone
+            const koreaFormatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: 'Asia/Seoul',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            
+            const parts = koreaFormatter.formatToParts(now);
+            const koreaTime = new Date(
+                parseInt(parts.find(p => p.type === 'year').value),
+                parseInt(parts.find(p => p.type === 'month').value) - 1,
+                parseInt(parts.find(p => p.type === 'day').value),
+                parseInt(parts.find(p => p.type === 'hour').value),
+                parseInt(parts.find(p => p.type === 'minute').value),
+                parseInt(parts.find(p => p.type === 'second').value)
+            );
+            
+            // Sunday = start of week
+            const dayOfWeek = koreaTime.getDay();
+            const weekStart = new Date(koreaTime);
+            weekStart.setDate(koreaTime.getDate() - dayOfWeek);
             weekStart.setHours(0, 0, 0, 0);
             
-            const elapsedMs = now - weekStart;
+            const elapsedMs = koreaTime - weekStart;
             const elapsedHours = elapsedMs / (1000 * 60 * 60);
 
             // Total available = 119h (168h - 49h sleep)
