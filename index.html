@@ -909,9 +909,14 @@
     </div>
 
     <script>
-        const calendarEvents = {
+        // Calendar events - Updated from Google Calendar
+        let calendarEvents = {};
+        
+        const calendarEventsFallback = {
             'Mon May 18': [],
             'Tue May 19': [
+                { name: 'GET UP & GET READY', time: '5:50 - 6:50 AM' },
+                { name: 'OTM', time: '7:00 - 9:00 AM' },
                 { name: 'Treuida filming', time: '9:00 AM - 1:00 PM' },
                 { name: 'NERD 안국', time: '2:00 - 4:05 PM' }
             ],
@@ -934,7 +939,7 @@
         function getBlockedTimeDisplay() {
             const now = new Date();
             const dayFormat = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-            const events = calendarEvents[dayFormat] || [];
+            const events = calendarEvents[dayFormat] || calendarEventsFallback[dayFormat] || [];
             
             if (events.length === 0) {
                 return '<div class="blocked-time-title">Blocked time</div><div class="blocked-time-empty">No events today</div>';
