@@ -767,10 +767,13 @@
 
             <div style="text-align: center; margin-top: 2rem;">
                 <div style="display: flex; gap: 1rem; justify-content: center; align-items: center; margin-bottom: 1rem;">
-                    <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #888;">End day for:</label>
+                    <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #888;">Archive data for:</label>
                     <input type="date" id="archiveDate" style="padding: 8px 12px; border: 2px solid #ff6b9d; border-radius: 6px; font-size: 12px; outline: none;">
                 </div>
-                <button onclick="archiveDailyData()" style="background: #ff6b9d; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">📊 End Day & Archive</button>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button onclick="archiveDailyData()" style="background: #ff6b9d; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">📊 Archive Day</button>
+                    <button onclick="startNewDay()" style="background: #4CAF50; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">✨ Start New Day</button>
+                </div>
             </div>
         </div>
 
@@ -1156,10 +1159,31 @@
             const selectedDateObj = new Date(selectedDate + 'T00:00:00');
             const dateStr = selectedDateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
 
-            if (confirm(`End day and move to tomorrow?\n\nArchiving data for: ${dateStr}\n\nThis will:\n✓ Save ${dateStr}'s data\n✓ Reset timers\n✓ Clear ${dateStr}'s task checkboxes\n✓ Move to next day\n\nProceed?`)) {
-                // Reset daily data for new day
+            if (confirm(`Archive data for: ${dateStr}\n\nThis will save:\n✓ Hours logged\n✓ Tasks completed\n✓ Habits checked\n\n(You can edit & re-archive if needed)\n\nProceed?`)) {
+                // Capture the daily data snapshot
                 checkAndResetDailyData();
                 
+                // Store archived data (overwrites if same day)
+                if (!state.archivedDays) state.archivedDays = {};
+                state.archivedDays[selectedDate] = {
+                    date: dateStr,
+                    projectHours: { ...state.dailyData.projectHours },
+                    motive: state.dailyData.motive,
+                    timestamp: new Date().toISOString()
+                };
+                
+                saveState();
+                alert(`✓ ${dateStr} archived!\n\n(You can still edit & re-archive if needed)`);
+                renderDailyReport();
+            }
+        }
+
+        function startNewDay() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+
+            if (confirm(`Start new day: ${tomorrowStr}\n\nThis will:\n✓ Reset timers to 0h\n✓ Clear task checkboxes\n✓ Reset daily progress bar\n\nProceed?`)) {
                 // Reset timers
                 state.focusSeconds = 0;
                 state.focusRunning = false;
@@ -1173,25 +1197,35 @@
                 document.getElementById('countdownInput').disabled = false;
                 displayFocusTimer();
                 
-                // Clear selected day's task checkboxes (but keep the tasks)
+                // Reset daily data for tomorrow
+                state.dailyData = {
+                    date: new Date().toDateString(),
+                    motive: state.motive,
+                    projectHours: { spotlite: 0, nerd: 0, makgeollina: 0, reading: 0, creative: 0, misc: 0 },
+                    tasksCompleted: [],
+                    habitsChecked: []
+                };
+                
+                // Clear today's task checkboxes (but keep the tasks)
                 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                const dayKey = dayNames[selectedDateObj.getDay()];
+                const today = new Date();
+                const dayKey = dayNames[today.getDay()];
                 Object.keys(state.dailyHabits[dayKey] || {}).forEach(key => {
                     state.dailyHabits[dayKey][key] = false;
                 });
                 
                 saveState();
-                alert(`✓ ${dateStr} archived! Ready for the next day.`);
+                alert(`✓ New day started: ${tomorrowStr}`);
                 
-                // Refresh displays
+                // Refresh all displays
                 renderDailyReport();
                 renderActiveProjectTasks();
                 updateHeader();
                 updateDailyProgressBar();
                 
                 // Reset date picker to today
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('archiveDate').value = today;
+                const today2 = new Date().toISOString().split('T')[0];
+                document.getElementById('archiveDate').value = today2;
             }
         }
 
