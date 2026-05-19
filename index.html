@@ -1175,11 +1175,9 @@
             const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
             document.getElementById('headerTime').textContent = timeStr;
 
-            // Calculate elapsed time this week (Monday 0:00 AM = start of week)
+            // Calculate elapsed time this week (Sunday 0:00 AM = start of week)
             const weekStart = new Date(now);
-            const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
-            const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Days since Monday
-            weekStart.setDate(now.getDate() - daysToMonday);
+            weekStart.setDate(now.getDate() - now.getDay());
             weekStart.setHours(0, 0, 0, 0);
             
             const elapsedMs = now - weekStart;
