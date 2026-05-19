@@ -766,6 +766,10 @@
             <div id="dailyHabitsSummary" style="background: rgba(156, 39, 176, 0.08); border: 2px solid rgba(156, 39, 176, 0.2); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;"></div>
 
             <div style="text-align: center; margin-top: 2rem;">
+                <div style="display: flex; gap: 1rem; justify-content: center; align-items: center; margin-bottom: 1rem;">
+                    <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #888;">End day for:</label>
+                    <input type="date" id="archiveDate" style="padding: 8px 12px; border: 2px solid #ff6b9d; border-radius: 6px; font-size: 12px; outline: none;">
+                </div>
                 <button onclick="archiveDailyData()" style="background: #ff6b9d; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">📊 End Day & Archive</button>
             </div>
         </div>
@@ -1142,7 +1146,17 @@
         }
 
         function archiveDailyData() {
-            if (confirm('End day and move to tomorrow?\n\nThis will:\n✓ Save today\'s data\n✓ Reset timers\n✓ Clear today\'s tasks\n✓ Move to tomorrow\n\nProceed?')) {
+            const selectedDate = document.getElementById('archiveDate').value;
+            
+            if (!selectedDate) {
+                alert('Please select a date to archive');
+                return;
+            }
+
+            const selectedDateObj = new Date(selectedDate + 'T00:00:00');
+            const dateStr = selectedDateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+
+            if (confirm(`End day and move to tomorrow?\n\nArchiving data for: ${dateStr}\n\nThis will:\n✓ Save ${dateStr}'s data\n✓ Reset timers\n✓ Clear ${dateStr}'s task checkboxes\n✓ Move to next day\n\nProceed?`)) {
                 // Reset daily data for new day
                 checkAndResetDailyData();
                 
@@ -1159,19 +1173,24 @@
                 document.getElementById('countdownInput').disabled = false;
                 displayFocusTimer();
                 
-                // Clear today's task checkboxes (but keep the tasks)
-                const dayKey = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+                // Clear selected day's task checkboxes (but keep the tasks)
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const dayKey = dayNames[selectedDateObj.getDay()];
                 Object.keys(state.dailyHabits[dayKey] || {}).forEach(key => {
                     state.dailyHabits[dayKey][key] = false;
                 });
                 
                 saveState();
-                alert('✓ Day archived! Tomorrow ready to go.');
+                alert(`✓ ${dateStr} archived! Ready for the next day.`);
                 
                 // Refresh displays
                 renderDailyReport();
                 renderActiveProjectTasks();
                 updateHeader();
+                
+                // Reset date picker to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('archiveDate').value = today;
             }
         }
 
@@ -1846,6 +1865,14 @@
 
         loadState();
         updateHeader();
+        
+        // Set archive date to today by default
+        const today = new Date().toISOString().split('T')[0];
+        const archiveDateInput = document.getElementById('archiveDate');
+        if (archiveDateInput) {
+            archiveDateInput.value = today;
+        }
+        
         renderAllocations();
         renderWeekGridWithDetails();
         renderSidebar();
