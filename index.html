@@ -729,7 +729,8 @@
             <button class="tab-btn" onclick="switchTab('daily')">Daily</button>
             <button class="tab-btn" onclick="switchTab('timers')">Timers</button>
             <button class="tab-btn" onclick="switchTab('habits')">Habits</button>
-            <button class="tab-btn" onclick="switchTab('fitness')">Fitness</button>
+            <button class="tab-btn" onclick="switchTab('health')">Health</button>
+            <button class="tab-btn" onclick="switchTab('brain')">Brain Health</button>
             <button class="tab-btn" onclick="switchTab('report')">Report</button>
         </div>
 
@@ -851,8 +852,8 @@
             <div id="customHabitsDisplay"></div>
         </div>
 
-        <!-- FITNESS TAB -->
-        <div id="fitness" class="tab-content">
+        <!-- HEALTH TAB -->
+        <div id="health" class="tab-content">
             <h2 class="section-title">💪 Fitness & Steps</h2>
             
             <div class="adhoc-section">
@@ -903,6 +904,50 @@
 
             <h2 class="section-title">📊 Weekly steps</h2>
             <div class="steps-grid" id="stepsWeekGrid"></div>
+        </div>
+
+        <!-- BRAIN HEALTH TAB -->
+        <div id="brain" class="tab-content">
+            <h2 class="section-title">🧠 Brain Health</h2>
+
+            <h3 class="section-title">😴 Sleep Tracker</h3>
+            <div class="adhoc-section">
+                <div class="adhoc-title">Log sleep hours</div>
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center;">
+                    <input type="number" id="sleepHours" placeholder="hours" value="7" step="0.5" min="0" max="12" style="padding: 10px 12px; border: 1px solid rgba(156, 39, 176, 0.3); border-radius: 6px; font-size: 12px; text-align: center; width: 80px;">
+                    <span style="font-size: 12px; color: #999;">hours</span>
+                </div>
+                <button class="adhoc-add-btn" style="background: #9C27B0;" onclick="logSleep()">✓ Log sleep</button>
+            </div>
+
+            <h3 class="section-title">📊 Sleep Stats</h3>
+            <div id="sleepStats" style="background: rgba(156, 39, 176, 0.08); border: 2px solid rgba(156, 39, 176, 0.2); padding: 1.5rem; border-radius: 12px;"></div>
+
+            <h3 class="section-title">💡 ADHD Tips & Hacks</h3>
+            <div style="background: rgba(255, 193, 7, 0.08); border: 2px solid rgba(255, 193, 7, 0.2); padding: 1.5rem; border-radius: 12px;">
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div>
+                        <div style="font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">⏲️ Time Blindness Combat</div>
+                        <div style="font-size: 12px; color: #666; line-height: 1.6;">Use visual timers, not just alarms. Set 3-4 checkpoints in your day. Let the countdown be your anchor — don't just "feel" when time is up.</div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">⚡ Energy Bursts > Consistency</div>
+                        <div style="font-size: 12px; color: #666; line-height: 1.6;">Stop forcing 8-hour work days. Ride your energy waves. Log 3 intense hours, rest, log again. Track when you're most focused — your "peak hours" are gold.</div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">🎯 Hyperfocus is a Superpower</div>
+                        <div style="font-size: 12px; color: #666; line-height: 1.6;">When you lock in, protect that time. Don't interrupt hyperfocus for "important" stuff. Let the countdown timer run — you'll know when you're done.</div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">😴 Sleep is Your Superpower</div>
+                        <div style="font-size: 12px; color: #666; line-height: 1.6;">One bad sleep day = one bad focus day. Track it. If you're under 6h, expect lower energy. If you hit 8h+, you're golden. Sleep = your most valuable currency.</div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">🧪 Dopamine Hits Matter</div>
+                        <div style="font-size: 12px; color: #666; line-height: 1.6;">Small wins = momentum. Checking off a task, hitting a timer milestone, logging time — these matter. Use them. Your brain needs the hit to keep going.</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- REPORT TAB -->
@@ -1011,6 +1056,7 @@
             customHabits: [],
             fitnessLog: [],
             steps: { today: '' },
+            sleepLog: [],
             dailyData: {
                 date: new Date().toDateString(),
                 motive: "I am building a life of creative freedom and aligned impact.",
@@ -1179,11 +1225,32 @@
         }
 
         function startNewDay() {
+            const sleepPrompt = prompt('How many hours did you sleep last night?', '7');
+            
+            if (sleepPrompt === null) {
+                return; // User cancelled
+            }
+
+            const sleepHours = parseFloat(sleepPrompt);
+            if (!sleepHours || sleepHours < 0) {
+                alert('Please enter valid sleep hours');
+                return;
+            }
+
+            // Log the sleep
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            state.sleepLog.push({
+                hours: sleepHours,
+                date: yesterday.toISOString().split('T')[0],
+                timestamp: new Date()
+            });
+
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             const tomorrowStr = tomorrow.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
 
-            if (confirm(`Start new day: ${tomorrowStr}\n\nThis will:\n✓ Reset timers to 0h\n✓ Clear task checkboxes\n✓ Reset daily progress bar\n\nProceed?`)) {
+            if (confirm(`✓ Logged ${sleepHours}h sleep\n\nStart new day: ${tomorrowStr}\n\nThis will:\n✓ Reset timers to 0h\n✓ Clear task checkboxes\n✓ Reset daily progress bar\n\nProceed?`)) {
                 // Reset timers
                 state.focusSeconds = 0;
                 state.focusRunning = false;
@@ -1222,6 +1289,7 @@
                 renderActiveProjectTasks();
                 updateHeader();
                 updateDailyProgressBar();
+                renderSleepStats();
                 
                 // Reset date picker to today
                 const today2 = new Date().toISOString().split('T')[0];
@@ -1764,7 +1832,62 @@
             saveState();
         }
 
-        function renderFitnessLog() {
+        function logSleep() {
+            const hours = parseFloat(document.getElementById('sleepHours').value);
+
+            if (!hours || hours < 0) {
+                alert('Please enter valid sleep hours');
+                return;
+            }
+
+            state.sleepLog.push({
+                hours,
+                date: new Date().toISOString().split('T')[0],
+                timestamp: new Date()
+            });
+
+            document.getElementById('sleepHours').value = '7';
+            renderSleepStats();
+            saveState();
+            alert(`✓ Logged ${hours}h sleep`);
+        }
+
+        function renderSleepStats() {
+            const statsDiv = document.getElementById('sleepStats');
+            const today = new Date().toISOString().split('T')[0];
+            const thisWeekStart = new Date();
+            thisWeekStart.setDate(thisWeekStart.getDate() - (thisWeekStart.getDay() === 0 ? 6 : thisWeekStart.getDay() - 1));
+            thisWeekStart.setHours(0, 0, 0, 0);
+
+            const todaySleep = state.sleepLog.find(log => log.date === today);
+            const weekSleep = state.sleepLog.filter(log => new Date(log.date) >= thisWeekStart);
+            const avgSleep = weekSleep.length > 0 ? (weekSleep.reduce((sum, log) => sum + log.hours, 0) / weekSleep.length).toFixed(1) : '0';
+            const targetWeek = 49; // 7h × 7 days
+            const totalWeek = weekSleep.reduce((sum, log) => sum + log.hours, 0).toFixed(1);
+            const deficit = Math.max(0, (targetWeek - totalWeek).toFixed(1));
+
+            statsDiv.innerHTML = `
+                <div class="report-stat">
+                    <span>Last night</span>
+                    <strong>${todaySleep ? todaySleep.hours + 'h' : '—'}</strong>
+                </div>
+                <div class="report-stat">
+                    <span>This week avg</span>
+                    <strong>${avgSleep}h / 7h target</strong>
+                </div>
+                <div class="report-stat">
+                    <span>Week total</span>
+                    <strong>${totalWeek}h / ${targetWeek}h</strong>
+                </div>
+                <div class="report-stat">
+                    <span>Sleep deficit</span>
+                    <strong style="color: ${deficit > 0 ? '#E91E63' : '#4CAF50'};">${deficit}h</strong>
+                </div>
+                <div style="margin-top: 1rem; font-size: 11px; color: #999;">
+                    ${weekSleep.length === 0 ? '<em>No sleep logs this week yet</em>' : `<strong>Logged ${weekSleep.length} days this week</strong>`}
+                </div>
+            `;
+        }
             const displayDiv = document.getElementById('fitnessLogDisplay');
             const today = new Date().toDateString();
             const todayLog = state.fitnessLog.filter(entry => new Date(entry.timestamp).toDateString() === today);
@@ -1918,6 +2041,7 @@
         renderFitnessLog();
         renderDailyReport();
         renderWeeklyReport();
+        renderSleepStats();
         updateDailyProgressBar();
 
         setInterval(updateHeader, 60000);
