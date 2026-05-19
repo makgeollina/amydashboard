@@ -1135,10 +1135,36 @@
         }
 
         function archiveDailyData() {
-            if (confirm('End day and archive today\'s data?\n\nThis will:\n✓ Save today\'s summary\n✓ Reset for tomorrow\n\nProceed?')) {
+            if (confirm('End day and move to tomorrow?\n\nThis will:\n✓ Save today\'s data\n✓ Reset timers\n✓ Clear today\'s tasks\n✓ Move to tomorrow\n\nProceed?')) {
+                // Reset daily data for new day
                 checkAndResetDailyData();
-                alert('📊 Today\'s data archived! New day started.');
+                
+                // Reset timers
+                state.focusSeconds = 0;
+                state.focusRunning = false;
+                state.countdownStart = null;
+                document.getElementById('focusTag').value = '';
+                document.getElementById('countdownInput').value = '1';
+                document.getElementById('focusPlayBtn').style.display = 'inline-block';
+                document.getElementById('focusStopBtn').style.display = 'none';
+                document.getElementById('focusLogBtn').style.display = 'none';
+                document.getElementById('focusTag').disabled = false;
+                document.getElementById('countdownInput').disabled = false;
+                displayFocusTimer();
+                
+                // Clear today's task checkboxes (but keep the tasks)
+                const dayKey = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+                Object.keys(state.dailyHabits[dayKey] || {}).forEach(key => {
+                    state.dailyHabits[dayKey][key] = false;
+                });
+                
+                saveState();
+                alert('✓ Day archived! Tomorrow ready to go.');
+                
+                // Refresh displays
                 renderDailyReport();
+                renderActiveProjectTasks();
+                updateHeader();
             }
         }
 
@@ -1728,11 +1754,20 @@
         }
 
         function resetWeekData() {
-            if (confirm('Reset all week data?\n\nThis will clear:\n✓ Project hours\n✓ Tasks\n✓ Fitness logs\n✓ Steps\n\nBut KEEPS:\n✓ Habits\n✓ Custom habits\n✓ Daily habit checkboxes\n\nProceed?')) {
+            if (confirm('Reset for new week?\n\nThis will clear:\n✓ Project hours\n✓ Tasks\n✓ Fitness logs\n✓ Steps\n✓ Daily habit checkboxes\n\nBut KEEPS:\n✓ Habits\n✓ Custom habits\n✓ Motive\n\nProceed?')) {
                 state.projectHours = { spotlite: 0, nerd: 0, makgeollina: 0, reading: 0, creative: 0, misc: 0 };
                 state.projectTasks = { spotlite: [], nerd: [], makgeollina: [], reading: [], creative: [], misc: [] };
                 state.fitnessLog = [];
                 state.steps = { today: '' };
+                
+                // Clear ALL daily habit checkboxes for new week
+                const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                days.forEach(day => {
+                    Object.keys(state.dailyHabits[day]).forEach(habitKey => {
+                        state.dailyHabits[day][habitKey] = false;
+                    });
+                });
+                
                 saveState();
                 renderAllocations();
                 renderActiveProjectTasks();
@@ -1741,7 +1776,8 @@
                 renderWeeklyReport();
                 renderFitnessLog();
                 renderStepsWeekGrid();
-                alert('✓ Week reset! Ready for a new week.');
+                renderWeekGridWithDetails();
+                alert('✓ New week ready! Fresh start.');
             }
         }
 
