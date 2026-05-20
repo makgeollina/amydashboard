@@ -1385,7 +1385,8 @@
             const total = segments.reduce((sum, s) => sum + s.hours, 0);
             bar.innerHTML = segments.map(s => {
                 const percent = (s.hours / 24) * 100;
-                return `<div class="progress-segment" style="width: ${percent}%; background-color: ${s.color}; ${percent < 5 ? 'display: none;' : ''}"></div>`;
+                const displayHours = s.hours.toFixed(1);
+                return `<div class="progress-segment" style="width: ${percent}%; background-color: ${s.color}; ${percent < 5 ? 'display: none;' : ''}" title="${s.name}: ${displayHours}h">${percent > 8 ? displayHours + 'h' : ''}</div>`;
             }).join('');
         }
 
