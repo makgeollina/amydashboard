@@ -729,7 +729,8 @@
             <button class="tab-btn" onclick="switchTab('daily')">Daily</button>
             <button class="tab-btn" onclick="switchTab('timers')">Timers</button>
             <button class="tab-btn" onclick="switchTab('habits')">Habits</button>
-            <button class="tab-btn" onclick="switchTab('fitness')">Fitness</button>
+            <button class="tab-btn" onclick="switchTab('health')">Health</button>
+            <button class="tab-btn" onclick="switchTab('brain')">Brain Health</button>
             <button class="tab-btn" onclick="switchTab('report')">Report</button>
         </div>
 
@@ -767,10 +768,13 @@
 
             <div style="text-align: center; margin-top: 2rem;">
                 <div style="display: flex; gap: 1rem; justify-content: center; align-items: center; margin-bottom: 1rem;">
-                    <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #888;">End day for:</label>
+                    <label style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #888;">Archive data for:</label>
                     <input type="date" id="archiveDate" style="padding: 8px 12px; border: 2px solid #ff6b9d; border-radius: 6px; font-size: 12px; outline: none;">
                 </div>
-                <button onclick="archiveDailyData()" style="background: #ff6b9d; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">📊 End Day & Archive</button>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button onclick="archiveDailyData()" style="background: #ff6b9d; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">📊 Archive Day</button>
+                    <button onclick="startNewDay()" style="background: #4CAF50; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">✨ Start New Day</button>
+                </div>
             </div>
         </div>
 
@@ -848,8 +852,8 @@
             <div id="customHabitsDisplay"></div>
         </div>
 
-        <!-- FITNESS TAB -->
-        <div id="fitness" class="tab-content">
+        <!-- HEALTH TAB -->
+        <div id="health" class="tab-content">
             <h2 class="section-title">💪 Fitness & Steps</h2>
             
             <div class="adhoc-section">
@@ -900,6 +904,50 @@
 
             <h2 class="section-title">📊 Weekly steps</h2>
             <div class="steps-grid" id="stepsWeekGrid"></div>
+        </div>
+
+        <!-- BRAIN HEALTH TAB -->
+        <div id="brain" class="tab-content">
+            <h2 class="section-title">🧠 Brain Health</h2>
+
+            <h3 class="section-title">😴 Sleep Tracker</h3>
+            <div class="adhoc-section">
+                <div class="adhoc-title">Log sleep hours</div>
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center;">
+                    <input type="number" id="sleepHours" placeholder="hours" value="7" step="0.5" min="0" max="12" style="padding: 10px 12px; border: 1px solid rgba(156, 39, 176, 0.3); border-radius: 6px; font-size: 12px; text-align: center; width: 80px;">
+                    <span style="font-size: 12px; color: #999;">hours</span>
+                </div>
+                <button class="adhoc-add-btn" style="background: #9C27B0;" onclick="logSleep()">✓ Log sleep</button>
+            </div>
+
+            <h3 class="section-title">📊 Sleep Stats</h3>
+            <div id="sleepStats" style="background: rgba(156, 39, 176, 0.08); border: 2px solid rgba(156, 39, 176, 0.2); padding: 1.5rem; border-radius: 12px;"></div>
+
+            <h3 class="section-title">💡 ADHD Tips & Hacks</h3>
+            <div style="background: rgba(255, 193, 7, 0.08); border: 2px solid rgba(255, 193, 7, 0.2); padding: 1.5rem; border-radius: 12px;">
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <div>
+                        <div style="font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">⏲️ Time Blindness Combat</div>
+                        <div style="font-size: 12px; color: #666; line-height: 1.6;">Use visual timers, not just alarms. Set 3-4 checkpoints in your day. Let the countdown be your anchor — don't just "feel" when time is up.</div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">⚡ Energy Bursts > Consistency</div>
+                        <div style="font-size: 12px; color: #666; line-height: 1.6;">Stop forcing 8-hour work days. Ride your energy waves. Log 3 intense hours, rest, log again. Track when you're most focused — your "peak hours" are gold.</div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">🎯 Hyperfocus is a Superpower</div>
+                        <div style="font-size: 12px; color: #666; line-height: 1.6;">When you lock in, protect that time. Don't interrupt hyperfocus for "important" stuff. Let the countdown timer run — you'll know when you're done.</div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">😴 Sleep is Your Superpower</div>
+                        <div style="font-size: 12px; color: #666; line-height: 1.6;">One bad sleep day = one bad focus day. Track it. If you're under 6h, expect lower energy. If you hit 8h+, you're golden. Sleep = your most valuable currency.</div>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem;">🧪 Dopamine Hits Matter</div>
+                        <div style="font-size: 12px; color: #666; line-height: 1.6;">Small wins = momentum. Checking off a task, hitting a timer milestone, logging time — these matter. Use them. Your brain needs the hit to keep going.</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- REPORT TAB -->
@@ -1008,6 +1056,7 @@
             customHabits: [],
             fitnessLog: [],
             steps: { today: '' },
+            sleepLog: [],
             dailyData: {
                 date: new Date().toDateString(),
                 motive: "I am building a life of creative freedom and aligned impact.",
@@ -1156,10 +1205,59 @@
             const selectedDateObj = new Date(selectedDate + 'T00:00:00');
             const dateStr = selectedDateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
 
-            if (confirm(`End day and move to tomorrow?\n\nArchiving data for: ${dateStr}\n\nThis will:\n✓ Save ${dateStr}'s data\n✓ Reset timers\n✓ Clear ${dateStr}'s task checkboxes\n✓ Move to next day\n\nProceed?`)) {
-                // Reset daily data for new day
+            if (confirm(`Archive data for: ${dateStr}\n\nThis will save:\n✓ Hours logged\n✓ Tasks completed\n✓ Habits checked\n\n(You can edit & re-archive if needed)\n\nProceed?`)) {
+                // Capture the daily data snapshot
                 checkAndResetDailyData();
                 
+                // Store archived data (overwrites if same day)
+                if (!state.archivedDays) state.archivedDays = {};
+                state.archivedDays[selectedDate] = {
+                    date: dateStr,
+                    projectHours: { ...state.dailyData.projectHours },
+                    motive: state.dailyData.motive,
+                    timestamp: new Date().toISOString()
+                };
+                
+                saveState();
+                alert(`✓ ${dateStr} archived!\n\n(You can still edit & re-archive if needed)`);
+                renderDailyReport();
+            }
+        }
+
+        function startNewDay() {
+            const sleepPrompt = prompt('How many hours did you sleep last night?', '7');
+            
+            if (sleepPrompt === null) {
+                return; // User cancelled
+            }
+
+            const sleepHours = parseFloat(sleepPrompt);
+            if (!sleepHours || sleepHours < 0) {
+                alert('Please enter valid sleep hours');
+                return;
+            }
+
+            // Get selected date from archive picker
+            const selectedDate = document.getElementById('archiveDate').value;
+            if (!selectedDate) {
+                alert('Please select a date in the archive picker first');
+                return;
+            }
+
+            // Log the sleep for the selected date
+            state.sleepLog.push({
+                hours: sleepHours,
+                date: selectedDate,
+                timestamp: new Date()
+            });
+
+            // Calculate next day
+            const selectedDateObj = new Date(selectedDate + 'T00:00:00');
+            const nextDay = new Date(selectedDateObj);
+            nextDay.setDate(nextDay.getDate() + 1);
+            const nextDayStr = nextDay.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+
+            if (confirm(`✓ Logged ${sleepHours}h sleep for ${selectedDate}\n\nStart new day: ${nextDayStr}\n\nThis will:\n✓ Reset timers to 0h\n✓ Clear task checkboxes\n✓ Reset daily progress bar\n\nProceed?`)) {
                 // Reset timers
                 state.focusSeconds = 0;
                 state.focusRunning = false;
@@ -1173,6 +1271,15 @@
                 document.getElementById('countdownInput').disabled = false;
                 displayFocusTimer();
                 
+                // Reset daily data for next day
+                state.dailyData = {
+                    date: nextDay.toDateString(),
+                    motive: state.motive,
+                    projectHours: { spotlite: 0, nerd: 0, makgeollina: 0, reading: 0, creative: 0, misc: 0 },
+                    tasksCompleted: [],
+                    habitsChecked: []
+                };
+                
                 // Clear selected day's task checkboxes (but keep the tasks)
                 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
                 const dayKey = dayNames[selectedDateObj.getDay()];
@@ -1181,80 +1288,85 @@
                 });
                 
                 saveState();
-                alert(`✓ ${dateStr} archived! Ready for the next day.`);
+                alert(`✓ New day started: ${tomorrowStr}`);
                 
-                // Refresh displays
+                // Refresh all displays
                 renderDailyReport();
                 renderActiveProjectTasks();
                 updateHeader();
                 updateDailyProgressBar();
+                renderSleepStats();
                 
                 // Reset date picker to today
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('archiveDate').value = today;
+                const today2 = new Date().toISOString().split('T')[0];
+                document.getElementById('archiveDate').value = today2;
             }
         }
 
         function updateHeader() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-            document.getElementById('headerTime').textContent = timeStr;
+            try {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                document.getElementById('headerTime').textContent = timeStr;
 
-            // Get current time in Korea timezone
-            const koreaFormatter = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'Asia/Seoul',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false,
-                weekday: 'short'
-            });
-            
-            const parts = koreaFormatter.formatToParts(now);
-            const dayName = parts.find(p => p.type === 'weekday')?.value || '?';
-            const kstTime = new Date(
-                parseInt(parts.find(p => p.type === 'year').value),
-                parseInt(parts.find(p => p.type === 'month').value) - 1,
-                parseInt(parts.find(p => p.type === 'day').value),
-                parseInt(parts.find(p => p.type === 'hour').value),
-                parseInt(parts.find(p => p.type === 'minute').value),
-                parseInt(parts.find(p => p.type === 'second').value)
-            );
-            
-            // Display day and date
-            const monthDay = `${parts.find(p => p.type === 'month').value}/${parts.find(p => p.type === 'day').value}`;
-            const dayDisplay = document.querySelector('.header-time');
-            if (dayDisplay) {
-                dayDisplay.innerHTML = `${dayName.toUpperCase()}<br>${monthDay}<br>${timeStr}`;
+                // Get current time in Korea timezone
+                const koreaFormatter = new Intl.DateTimeFormat('en-US', {
+                    timeZone: 'Asia/Seoul',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                    weekday: 'short'
+                });
+                
+                const parts = koreaFormatter.formatToParts(now);
+                const dayName = parts.find(p => p.type === 'weekday')?.value || '?';
+                const kstTime = new Date(
+                    parseInt(parts.find(p => p.type === 'year').value),
+                    parseInt(parts.find(p => p.type === 'month').value) - 1,
+                    parseInt(parts.find(p => p.type === 'day').value),
+                    parseInt(parts.find(p => p.type === 'hour').value),
+                    parseInt(parts.find(p => p.type === 'minute').value),
+                    parseInt(parts.find(p => p.type === 'second').value)
+                );
+                
+                // Display day and date
+                const monthDay = `${parts.find(p => p.type === 'month').value}/${parts.find(p => p.type === 'day').value}`;
+                const dayDisplay = document.querySelector('.header-time');
+                if (dayDisplay) {
+                    dayDisplay.innerHTML = `${dayName.toUpperCase()}<br>${monthDay}<br>${timeStr}`;
+                }
+                
+                // Calculate Monday 00:00 KST as week start
+                const dayOfWeek = kstTime.getDay(); // 0 = Sunday, 1 = Monday
+                const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Days since Monday
+                const weekStart = new Date(kstTime);
+                weekStart.setDate(kstTime.getDate() - daysToMonday);
+                weekStart.setHours(0, 0, 0, 0);
+                
+                const elapsedMs = kstTime - weekStart;
+                const elapsedHours = elapsedMs / (1000 * 60 * 60);
+
+                // Total available = 119h (168h - 49h sleep)
+                const totalAvailable = 119;
+                const totalLogged = state && state.projectHours ? Object.values(state.projectHours).reduce((a, b) => a + b, 0) : 0;
+                const freeTime = Math.max(0, totalAvailable - elapsedHours - totalLogged);
+                document.getElementById('freeTime').textContent = freeTime.toFixed(1) + 'h';
+
+                const sleepHours = 7;
+                const sleepMs = sleepHours * 3600000;
+                const sleepTarget = new Date(now.getTime() + sleepMs);
+                const sleepTime = sleepTarget.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                document.getElementById('sleepCountdown').textContent = sleepTime;
+
+                // Update blocked time display
+                document.getElementById('blockedTimeDisplay').innerHTML = getBlockedTimeDisplay();
+            } catch (e) {
+                console.error('Error in updateHeader:', e);
             }
-            
-            // Calculate Monday 00:00 KST as week start
-            const dayOfWeek = kstTime.getDay(); // 0 = Sunday, 1 = Monday
-            const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Days since Monday
-            const weekStart = new Date(kstTime);
-            weekStart.setDate(kstTime.getDate() - daysToMonday);
-            weekStart.setHours(0, 0, 0, 0);
-            
-            const elapsedMs = kstTime - weekStart;
-            const elapsedHours = elapsedMs / (1000 * 60 * 60);
-
-            // Total available = 119h (168h - 49h sleep)
-            const totalAvailable = 119;
-            const totalLogged = Object.values(state.projectHours).reduce((a, b) => a + b, 0);
-            const freeTime = Math.max(0, totalAvailable - elapsedHours - totalLogged);
-            document.getElementById('freeTime').textContent = freeTime.toFixed(1) + 'h';
-
-            const sleepHours = 7;
-            const sleepMs = sleepHours * 3600000;
-            const sleepTarget = new Date(now.getTime() + sleepMs);
-            const sleepTime = sleepTarget.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-            document.getElementById('sleepCountdown').textContent = sleepTime;
-
-            // Update blocked time display
-            document.getElementById('blockedTimeDisplay').innerHTML = getBlockedTimeDisplay();
         }
 
         function updateDailyProgressBar() {
@@ -1730,6 +1842,63 @@
             saveState();
         }
 
+        function logSleep() {
+            const hours = parseFloat(document.getElementById('sleepHours').value);
+
+            if (!hours || hours < 0) {
+                alert('Please enter valid sleep hours');
+                return;
+            }
+
+            state.sleepLog.push({
+                hours,
+                date: new Date().toISOString().split('T')[0],
+                timestamp: new Date()
+            });
+
+            document.getElementById('sleepHours').value = '7';
+            renderSleepStats();
+            saveState();
+            alert(`✓ Logged ${hours}h sleep`);
+        }
+
+        function renderSleepStats() {
+            const statsDiv = document.getElementById('sleepStats');
+            const today = new Date().toISOString().split('T')[0];
+            const thisWeekStart = new Date();
+            thisWeekStart.setDate(thisWeekStart.getDate() - (thisWeekStart.getDay() === 0 ? 6 : thisWeekStart.getDay() - 1));
+            thisWeekStart.setHours(0, 0, 0, 0);
+
+            const todaySleep = state.sleepLog.find(log => log.date === today);
+            const weekSleep = state.sleepLog.filter(log => new Date(log.date) >= thisWeekStart);
+            const avgSleep = weekSleep.length > 0 ? (weekSleep.reduce((sum, log) => sum + log.hours, 0) / weekSleep.length).toFixed(1) : '0';
+            const targetWeek = 49; // 7h × 7 days
+            const totalWeek = weekSleep.reduce((sum, log) => sum + log.hours, 0).toFixed(1);
+            const deficit = Math.max(0, (targetWeek - totalWeek).toFixed(1));
+
+            statsDiv.innerHTML = `
+                <div class="report-stat">
+                    <span>Last night</span>
+                    <strong>${todaySleep ? todaySleep.hours + 'h' : '—'}</strong>
+                </div>
+                <div class="report-stat">
+                    <span>This week avg</span>
+                    <strong>${avgSleep}h / 7h target</strong>
+                </div>
+                <div class="report-stat">
+                    <span>Week total</span>
+                    <strong>${totalWeek}h / ${targetWeek}h</strong>
+                </div>
+                <div class="report-stat">
+                    <span>Sleep deficit</span>
+                    <strong style="color: ${deficit > 0 ? '#E91E63' : '#4CAF50'};">${deficit}h</strong>
+                </div>
+                <div style="margin-top: 1rem; font-size: 11px; color: #999;">
+                    ${weekSleep.length === 0 ? '<em>No sleep logs this week yet</em>' : `<strong>Logged ${weekSleep.length} days this week</strong>`}
+                </div>
+            `;
+        }
+
         function renderFitnessLog() {
             const displayDiv = document.getElementById('fitnessLogDisplay');
             const today = new Date().toDateString();
@@ -1884,6 +2053,7 @@
         renderFitnessLog();
         renderDailyReport();
         renderWeeklyReport();
+        renderSleepStats();
         updateDailyProgressBar();
 
         setInterval(updateHeader, 60000);
