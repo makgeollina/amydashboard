@@ -1298,65 +1298,69 @@
         }
 
         function updateHeader() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-            document.getElementById('headerTime').textContent = timeStr;
+            try {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                document.getElementById('headerTime').textContent = timeStr;
 
-            // Get current time in Korea timezone
-            const koreaFormatter = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'Asia/Seoul',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false,
-                weekday: 'short'
-            });
-            
-            const parts = koreaFormatter.formatToParts(now);
-            const dayName = parts.find(p => p.type === 'weekday')?.value || '?';
-            const kstTime = new Date(
-                parseInt(parts.find(p => p.type === 'year').value),
-                parseInt(parts.find(p => p.type === 'month').value) - 1,
-                parseInt(parts.find(p => p.type === 'day').value),
-                parseInt(parts.find(p => p.type === 'hour').value),
-                parseInt(parts.find(p => p.type === 'minute').value),
-                parseInt(parts.find(p => p.type === 'second').value)
-            );
-            
-            // Display day and date
-            const monthDay = `${parts.find(p => p.type === 'month').value}/${parts.find(p => p.type === 'day').value}`;
-            const dayDisplay = document.querySelector('.header-time');
-            if (dayDisplay) {
-                dayDisplay.innerHTML = `${dayName.toUpperCase()}<br>${monthDay}<br>${timeStr}`;
+                // Get current time in Korea timezone
+                const koreaFormatter = new Intl.DateTimeFormat('en-US', {
+                    timeZone: 'Asia/Seoul',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                    weekday: 'short'
+                });
+                
+                const parts = koreaFormatter.formatToParts(now);
+                const dayName = parts.find(p => p.type === 'weekday')?.value || '?';
+                const kstTime = new Date(
+                    parseInt(parts.find(p => p.type === 'year').value),
+                    parseInt(parts.find(p => p.type === 'month').value) - 1,
+                    parseInt(parts.find(p => p.type === 'day').value),
+                    parseInt(parts.find(p => p.type === 'hour').value),
+                    parseInt(parts.find(p => p.type === 'minute').value),
+                    parseInt(parts.find(p => p.type === 'second').value)
+                );
+                
+                // Display day and date
+                const monthDay = `${parts.find(p => p.type === 'month').value}/${parts.find(p => p.type === 'day').value}`;
+                const dayDisplay = document.querySelector('.header-time');
+                if (dayDisplay) {
+                    dayDisplay.innerHTML = `${dayName.toUpperCase()}<br>${monthDay}<br>${timeStr}`;
+                }
+                
+                // Calculate Monday 00:00 KST as week start
+                const dayOfWeek = kstTime.getDay(); // 0 = Sunday, 1 = Monday
+                const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Days since Monday
+                const weekStart = new Date(kstTime);
+                weekStart.setDate(kstTime.getDate() - daysToMonday);
+                weekStart.setHours(0, 0, 0, 0);
+                
+                const elapsedMs = kstTime - weekStart;
+                const elapsedHours = elapsedMs / (1000 * 60 * 60);
+
+                // Total available = 119h (168h - 49h sleep)
+                const totalAvailable = 119;
+                const totalLogged = state && state.projectHours ? Object.values(state.projectHours).reduce((a, b) => a + b, 0) : 0;
+                const freeTime = Math.max(0, totalAvailable - elapsedHours - totalLogged);
+                document.getElementById('freeTime').textContent = freeTime.toFixed(1) + 'h';
+
+                const sleepHours = 7;
+                const sleepMs = sleepHours * 3600000;
+                const sleepTarget = new Date(now.getTime() + sleepMs);
+                const sleepTime = sleepTarget.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                document.getElementById('sleepCountdown').textContent = sleepTime;
+
+                // Update blocked time display
+                document.getElementById('blockedTimeDisplay').innerHTML = getBlockedTimeDisplay();
+            } catch (e) {
+                console.error('Error in updateHeader:', e);
             }
-            
-            // Calculate Monday 00:00 KST as week start
-            const dayOfWeek = kstTime.getDay(); // 0 = Sunday, 1 = Monday
-            const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Days since Monday
-            const weekStart = new Date(kstTime);
-            weekStart.setDate(kstTime.getDate() - daysToMonday);
-            weekStart.setHours(0, 0, 0, 0);
-            
-            const elapsedMs = kstTime - weekStart;
-            const elapsedHours = elapsedMs / (1000 * 60 * 60);
-
-            // Total available = 119h (168h - 49h sleep)
-            const totalAvailable = 119;
-            const totalLogged = Object.values(state.projectHours).reduce((a, b) => a + b, 0);
-            const freeTime = Math.max(0, totalAvailable - elapsedHours - totalLogged);
-            document.getElementById('freeTime').textContent = freeTime.toFixed(1) + 'h';
-
-            const sleepHours = 7;
-            const sleepMs = sleepHours * 3600000;
-            const sleepTarget = new Date(now.getTime() + sleepMs);
-            const sleepTime = sleepTarget.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-            document.getElementById('sleepCountdown').textContent = sleepTime;
-
-            // Update blocked time display
-            document.getElementById('blockedTimeDisplay').innerHTML = getBlockedTimeDisplay();
         }
 
         function updateDailyProgressBar() {
