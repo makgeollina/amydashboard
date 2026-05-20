@@ -105,6 +105,37 @@
             margin-bottom: 2px;
         }
         
+        .sleep-deficit {
+            background: linear-gradient(135deg, #ffe8eb 0%, #fff0f3 100%);
+            border: 2px solid #E91E63;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 140px;
+        }
+        
+        .sleep-deficit-title {
+            color: #E91E63;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+        
+        .sleep-deficit-value {
+            color: #1a1a1a;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .sleep-deficit-warning {
+            color: #E91E63;
+            font-size: 9px;
+            margin-top: 2px;
+        }
+        
         .sync-status {
             font-size: 10px;
             color: #4CAF50;
@@ -711,6 +742,7 @@
                 <div class="stat-label">Sleep</div>
                 <div class="sleep-countdown" id="sleepCountdown">--h</div>
             </div>
+            <div class="sleep-deficit" id="sleepDeficitDisplay"></div>
             <div class="sync-status">📡 Synced</div>
         </div>
 
@@ -1362,6 +1394,28 @@
                 const sleepTime = sleepTarget.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
                 document.getElementById('sleepCountdown').textContent = sleepTime;
 
+                // Calculate sleep deficit for this week
+                const thisWeekStart = new Date();
+                thisWeekStart.setDate(thisWeekStart.getDate() - (thisWeekStart.getDay() === 0 ? 6 : thisWeekStart.getDay() - 1));
+                thisWeekStart.setHours(0, 0, 0, 0);
+                
+                const weekSleep = (state.sleepLog || []).filter(log => new Date(log.date) >= thisWeekStart);
+                const totalWeekSleep = weekSleep.reduce((sum, log) => sum + log.hours, 0);
+                const targetWeekSleep = 49; // 7h × 7 days
+                const sleepDeficit = totalWeekSleep - targetWeekSleep; // negative = deficit
+                const isDeficient = sleepDeficit < -4;
+                
+                const deficitDisplay = document.getElementById('sleepDeficitDisplay');
+                if (deficitDisplay) {
+                    const deficitText = sleepDeficit >= 0 ? `+${sleepDeficit.toFixed(1)}h` : `${sleepDeficit.toFixed(1)}h`;
+                    const warningText = isDeficient ? '⚠️ Go to bed early!' : '';
+                    deficitDisplay.innerHTML = `
+                        <div class="sleep-deficit-title">Sleep This Week</div>
+                        <div class="sleep-deficit-value">${deficitText}</div>
+                        ${warningText ? `<div class="sleep-deficit-warning">${warningText}</div>` : ''}
+                    `;
+                }
+
                 // Update blocked time display
                 document.getElementById('blockedTimeDisplay').innerHTML = getBlockedTimeDisplay();
             } catch (e) {
@@ -1376,15 +1430,22 @@
                 spotlite: 0, nerd: 0, makgeollina: 0, reading: 0, creative: 0, misc: 0
             };
             
+            // Get yesterday's sleep from sleep log
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayDate = yesterday.toISOString().split('T')[0];
+            const yesterdaySleep = state.sleepLog.find(log => log.date === yesterdayDate);
+            const sleepHours = yesterdaySleep ? yesterdaySleep.hours : 0;
+            
             const segments = [
-                { name: 'Sleep', hours: 7, color: '#999999' },
+                { name: 'Sleep', hours: sleepHours, color: '#999999' },
                 { name: 'Spotlite', hours: dailyHours.spotlite, color: '#9C27B0' },
                 { name: 'NERD', hours: dailyHours.nerd, color: '#FF9800' },
                 { name: 'Reading', hours: dailyHours.reading, color: '#4CAF50' },
                 { name: '@makgeollina', hours: dailyHours.makgeollina, color: '#2196F3' },
                 { name: 'Creative', hours: dailyHours.creative, color: '#E91E63' },
                 { name: 'Misc', hours: dailyHours.misc, color: '#999999' },
-                { name: 'Life', hours: 24 - 7 - Object.values(dailyHours).reduce((a, b) => a + b, 0), color: '#ff6b9d' }
+                { name: 'Life', hours: 24 - sleepHours - Object.values(dailyHours).reduce((a, b) => a + b, 0), color: '#ff6b9d' }
             ];
 
             const total = segments.reduce((sum, s) => sum + s.hours, 0);
