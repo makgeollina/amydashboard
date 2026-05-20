@@ -1371,15 +1371,20 @@
 
         function updateDailyProgressBar() {
             const bar = document.getElementById('dailyProgressBar');
+            // Use dailyData instead of state.projectHours to show only TODAY's hours
+            const dailyHours = state.dailyData.projectHours || {
+                spotlite: 0, nerd: 0, makgeollina: 0, reading: 0, creative: 0, misc: 0
+            };
+            
             const segments = [
                 { name: 'Sleep', hours: 7, color: '#999999' },
-                { name: 'Spotlite', hours: state.projectHours.spotlite, color: '#9C27B0' },
-                { name: 'NERD', hours: state.projectHours.nerd, color: '#FF9800' },
-                { name: 'Reading', hours: state.projectHours.reading, color: '#4CAF50' },
-                { name: '@makgeollina', hours: state.projectHours.makgeollina, color: '#2196F3' },
-                { name: 'Creative', hours: state.projectHours.creative, color: '#E91E63' },
-                { name: 'Misc', hours: state.projectHours.misc, color: '#999999' },
-                { name: 'Life', hours: 24 - 7 - Object.values(state.projectHours).reduce((a, b) => a + b, 0), color: '#ff6b9d' }
+                { name: 'Spotlite', hours: dailyHours.spotlite, color: '#9C27B0' },
+                { name: 'NERD', hours: dailyHours.nerd, color: '#FF9800' },
+                { name: 'Reading', hours: dailyHours.reading, color: '#4CAF50' },
+                { name: '@makgeollina', hours: dailyHours.makgeollina, color: '#2196F3' },
+                { name: 'Creative', hours: dailyHours.creative, color: '#E91E63' },
+                { name: 'Misc', hours: dailyHours.misc, color: '#999999' },
+                { name: 'Life', hours: 24 - 7 - Object.values(dailyHours).reduce((a, b) => a + b, 0), color: '#ff6b9d' }
             ];
 
             const total = segments.reduce((sum, s) => sum + s.hours, 0);
