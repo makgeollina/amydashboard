@@ -1892,6 +1892,8 @@
                 </div>
             `;
         }
+
+        function renderFitnessLog() {
             const displayDiv = document.getElementById('fitnessLogDisplay');
             const today = new Date().toDateString();
             const todayLog = state.fitnessLog.filter(entry => new Date(entry.timestamp).toDateString() === today);
