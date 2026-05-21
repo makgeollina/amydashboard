@@ -1397,7 +1397,6 @@
                 // Calculate sleep deficit based on day of week
                 // Daily targets: Mon=7, Tue=14, Wed=21, Thu=28, Fri=35, Sat=42, Sun=49
                 const dailyTargets = [49, 7, 14, 21, 28, 35, 42]; // Sun, Mon, Tue, Wed, Thu, Fri, Sat
-                const dayOfWeek = kstTime.getDay(); // 0=Sun, 1=Mon, etc.
                 const targetSleepForToday = dailyTargets[dayOfWeek];
                 
                 // Get all sleep logs from Sunday-Monday night to current day
