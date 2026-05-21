@@ -1394,15 +1394,20 @@
                 const sleepTime = sleepTarget.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
                 document.getElementById('sleepCountdown').textContent = sleepTime;
 
-                // Calculate sleep deficit for this week
-                const thisWeekStart = new Date();
-                thisWeekStart.setDate(thisWeekStart.getDate() - (thisWeekStart.getDay() === 0 ? 6 : thisWeekStart.getDay() - 1));
-                thisWeekStart.setHours(0, 0, 0, 0);
+                // Calculate sleep deficit based on day of week
+                // Daily targets: Mon=7, Tue=14, Wed=21, Thu=28, Fri=35, Sat=42, Sun=49
+                const dailyTargets = [49, 7, 14, 21, 28, 35, 42]; // Sun, Mon, Tue, Wed, Thu, Fri, Sat
+                const dayOfWeek = kstTime.getDay(); // 0=Sun, 1=Mon, etc.
+                const targetSleepForToday = dailyTargets[dayOfWeek];
                 
-                const weekSleep = (state.sleepLog || []).filter(log => new Date(log.date) >= thisWeekStart);
+                // Get all sleep logs from Sunday-Monday night to current day
+                const weekStart = new Date(kstTime);
+                weekStart.setDate(kstTime.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)); // Start of week (Monday)
+                weekStart.setHours(0, 0, 0, 0);
+                
+                const weekSleep = (state.sleepLog || []).filter(log => new Date(log.date) >= weekStart);
                 const totalWeekSleep = weekSleep.reduce((sum, log) => sum + log.hours, 0);
-                const targetWeekSleep = 49; // 7h × 7 days
-                const sleepDeficit = totalWeekSleep - targetWeekSleep; // negative = deficit
+                const sleepDeficit = totalWeekSleep - targetSleepForToday; // negative = deficit
                 const isDeficient = sleepDeficit < -4;
                 
                 const deficitDisplay = document.getElementById('sleepDeficitDisplay');
@@ -1410,8 +1415,9 @@
                     const deficitText = sleepDeficit >= 0 ? `+${sleepDeficit.toFixed(1)}h` : `${sleepDeficit.toFixed(1)}h`;
                     const warningText = isDeficient ? '⚠️ Go to bed early!' : '';
                     deficitDisplay.innerHTML = `
-                        <div class="sleep-deficit-title">Sleep This Week</div>
+                        <div class="sleep-deficit-title">Sleep Deficit</div>
                         <div class="sleep-deficit-value">${deficitText}</div>
+                        <div style="font-size: 9px; color: #666; margin-top: 2px;">Target: ${targetSleepForToday}h | Logged: ${totalWeekSleep.toFixed(1)}h</div>
                         ${warningText ? `<div class="sleep-deficit-warning">${warningText}</div>` : ''}
                     `;
                 }
