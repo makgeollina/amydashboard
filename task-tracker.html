@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amy's Task Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f5f7 0%, #ffffff 100%);
+            color: #1a1a1a;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .today-date {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tab-btn {
+            padding: 10px 16px;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #999;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: #ff6b9d;
+            border-bottom-color: #ff6b9d;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* TRACKER TAB */
+        .category {
+            margin-bottom: 2rem;
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .category-header h2 {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-toggle {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .category-total {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .task-row {
+            display: grid;
+            grid-template-columns: 30px 1fr 100px 40px 40px;
+            gap: 1rem;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #f0f0f0;
+            transition: all 0.2s;
+        }
+
+        .task-row:hover {
+            border-color: #ddd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .task-row.completed {
+            opacity: 0.6;
+            background: #f9f9f9;
+        }
+
+        .task-row.overtime {
+            background: rgba(255, 0, 0, 0.05);
+            border-color: #ff4444;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #ff6b9d;
+        }
+
+        .task-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .task-emoji {
+            font-size: 16px;
+            width: 24px;
+        }
+
+        .task-name {
+            font-size: 14px;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b9d, #ff9999);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .time-display {
+            font-size: 12px;
+            font-weight: 600;
+            text-align: right;
+            min-width: 100px;
+            color: #1a1a1a;
+        }
+
+        .timer-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            background: #ff6b9d;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .timer-btn:hover {
+            background: #ff5588;
+        }
+
+        .timer-btn.running {
+            background: #4CAF50;
+        }
+
+        .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            background: #f0f0f0;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #ddd;
+        }
+
+        .add-task {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px dashed #ddd;
+        }
+
+        .add-task input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .add-task button {
+            border: none;
+            background: #ff6b9d;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* TIMER MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .timer-display {
+            font-size: 48px;
+            font-weight: 700;
+            color: #ff6b9d;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-display.overtime {
+            color: #ff4444;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .timer-controls button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .timer-controls .play {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .timer-controls .pause {
+            background: #ff9800;
+            color: white;
+        }
+
+        .timer-controls .close {
+            background: #f0f0f0;
+            color: #1a1a1a;
+        }
+
+        /* DAILY REPORT */
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #f0f0f0;
+        }
+
+        .report-card h3 {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-stat {
+            font-size: 14px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .report-stat strong {
+            color: #1a1a1a;
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background: #4CAF50;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .reset-btn:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Task Tracker</h1>
+            <div class="header-right">
+                <div class="today-date" id="todayDate"></div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('tracker')">Tracker</button>
+            <button class="tab-btn" onclick="switchTab('daily')">Daily Report</button>
+            <button class="tab-btn" onclick="switchTab('weekly')">Weekly Review</button>
+        </div>
+
+        <!-- TRACKER TAB -->
+        <div id="tracker" class="tab-content active">
+            <div id="categories"></div>
+        </div>
+
+        <!-- DAILY REPORT TAB -->
+        <div id="daily" class="tab-content">
+            <div id="dailyReport"></div>
+        </div>
+
+        <!-- WEEKLY REVIEW TAB -->
+        <div id="weekly" class="tab-content">
+            <div id="weeklyReport"></div>
+        </div>
+    </div>
+
+    <!-- TIMER MODAL -->
+    <div class="modal" id="timerModal">
+        <div class="modal-content">
+            <h2 id="timerTaskName"></h2>
+            <div class="timer-display" id="timerDisplay">00:00:00</div>
+            <div class="timer-controls">
+                <button class="play" id="timerPlayBtn" onclick="startTimer()">▶ Start</button>
+                <button class="pause" id="timerPauseBtn" onclick="pauseTimer()" style="display: none;">⏸ Pause</button>
+                <button class="close" onclick="closeTimer()">Close</button>
+            </div>
+            <button class="reset-btn" onclick="logTimer()" style="background: #ff6b9d;">✓ Log Time</button>
+        </div>
+    </div>
+
+    <script>
+        // STATE
+        let state = {
+            categories: [],
+            tasks: [],
+            daily: {}, // date -> { taskId -> logged_hours }
+            weekly: {}, // week start -> totals
+            activeTimer: null,
+            timerSeconds: 0,
+            timerRunning: false,
+            timerStart: null,
+            timerInterval: null
+        };
+
+        // INIT
+        function init() {
+            loadState();
+            updateDate();
+            renderCategories();
+            renderDailyReport();
+            renderWeeklyReport();
+        }
+
+        function updateDate() {
+            const today = new Date();
+            const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
+            const date = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            document.getElementById('todayDate').textContent = `${dayName.toUpperCase()} • ${date}`;
+        }
+
+        // LOAD/SAVE
+        function loadState() {
+            const saved = localStorage.getItem('amyTaskTracker');
+            if (saved) {
+                state = JSON.parse(saved);
+            } else {
+                // Default categories
+                state.categories = [
+                    { id: 'monetary', name: 'MONETARY', emoji: '💰', color: '#ff6b9d' },
+                    { id: 'creative', name: 'CREATIVE', emoji: '🎨', color: '#ff9800' },
+                    { id: 'wise', name: 'WISE HABITS', emoji: '🧠', color: '#4CAF50' },
+                    { id: 'life', name: 'LIFE', emoji: '🏠', color: '#2196F3' }
+                ];
+                state.tasks = [
+                    { id: 1, category: 'monetary', emoji: '📹', name: 'Benny QA Video', budget: 2 },
+                    { id: 2, category: 'monetary', emoji: '🎬', name: 'Reaction Compilation', budget: 0.5 },
+                    { id: 3, category: 'creative', emoji: '✏️', name: 'Editing Project', budget: 5 },
+                    { id: 4, category: 'wise', emoji: '📖', name: 'Reading', budget: 3 },
+                    { id: 5, category: 'wise', emoji: '🙏', name: 'Prayer/Quiet Time', budget: 1.5 },
+                    { id: 6, category: 'life', emoji: '🍽️', name: 'Meals', budget: 2 }
+                ];
+                saveState();
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('amyTaskTracker', JSON.stringify(state));
+        }
+
+        // RENDER CATEGORIES
+        function renderCategories() {
+            const container = document.getElementById('categories');
+            container.innerHTML = '';
+
+            state.categories.forEach(cat => {
+                const tasks = state.tasks.filter(t => t.category === cat.id);
+                const totalBudget = tasks.reduce((sum, t) => sum + t.budget, 0);
+                
+                const catDiv = document.createElement('div');
+                catDiv.className = 'category';
+                catDiv.innerHTML = `
+                    <div class="category-header" onclick="toggleCategory('${cat.id}')">
+                        <h2>
+                            <span>${cat.emoji}</span>
+                            ${cat.name}
+                        </h2>
+                        <div class="category-total">${totalBudget}h allocated</div>
+                    </div>
+                    <div id="cat-${cat.id}" class="category-tasks">
+                        ${tasks.map(task => renderTaskRow(task)).join('')}
+                        <div class="add-task">
+                            <input type="text" placeholder="+ Add task" onkeypress="if(event.key==='Enter') addTask('${cat.id}', this.value); this.value='';">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(catDiv);
+            });
+        }
+
+        function renderTaskRow(task) {
+            const today = new Date().toISOString().split('T')[0];
+            const logged = state.daily[today]?.[task.id] || 0;
+            const progress = (logged / task.budget) * 100;
+            const isCompleted = logged >= task.budget;
+            const isOvertime = logged > task.budget;
+
+            return `
+                <div class="task-row ${isCompleted ? 'completed' : ''} ${isOvertime ? 'overtime' : ''}">
+                    <input type="checkbox" class="checkbox" ${isCompleted ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                    <div class="task-info">
+                        <span class="task-emoji">${task.emoji}</span>
+                        <div style="flex: 1;">
+                            <div class="task-name">${task.name}</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${Math.min(progress, 100)}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="time-display">${logged.toFixed(1)}h / ${task.budget}h</div>
+                    <button class="timer-btn" onclick="openTimer(${task.id})">⏱️</button>
+                    <div class="actions">
+                        <button class="action-btn" onclick="editTask(${task.id})">✏️</button>
+                        <button class="action-btn" onclick="deleteTask(${task.id})">✕</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addTask(categoryId, name) {
+            if (!name.trim()) return;
+            const newTask = {
+                id: Date.now(),
+                category: categoryId,
+                emoji: '•',
+                name: name,
+                budget: 1
+            };
+            state.tasks.push(newTask);
+            saveState();
+            renderCategories();
+        }
+
+        function deleteTask(taskId) {
+            state.tasks = state.tasks.filter(t => t.id !== taskId);
+            saveState();
+            renderCategories();
+        }
+
+        function editTask(taskId) {
+            const task = state.tasks.find(t => t.id === taskId);
+            if (!task) return;
+            const newName = prompt('Task name:', task.name);
+            if (newName) {
+                task.name = newName;
+                saveState();
+                renderCategories();
+            }
+        }
+
+        function toggleTask(taskId) {
+            // Just updates visual, actual time is logged via timer
+            renderCategories();
+        }
+
+        // TIMER
+        function openTimer(taskId) {
+            const task = state.tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            state.activeTimer = taskId;
+            state.timerSeconds = 0;
+            state.timerRunning = false;
+            
+            document.getElementById('timerTaskName').textContent = `${task.emoji} ${task.name}`;
+            document.getElementById('timerDisplay').textContent = '00:00:00';
+            document.getElementById('timerDisplay').classList.remove('overtime');
+            document.getElementById('timerPlayBtn').style.display = 'inline-block';
+            document.getElementById('timerPauseBtn').style.display = 'none';
+            document.getElementById('timerModal').classList.add('active');
+        }
+
+        function closeTimer() {
+            if (state.timerRunning) pauseTimer();
+            document.getElementById('timerModal').classList.remove('active');
+            state.activeTimer = null;
+        }
+
+        function startTimer() {
+            if (state.timerRunning) return;
+            state.timerRunning = true;
+            state.timerStart = Date.now() - (state.timerSeconds * 1000);
+            
+            document.getElementById('timerPlayBtn').style.display = 'none';
+            document.getElementById('timerPauseBtn').style.display = 'inline-block';
+            
+            state.timerInterval = setInterval(updateTimerDisplay, 100);
+        }
+
+        function pauseTimer() {
+            state.timerRunning = false;
+            clearInterval(state.timerInterval);
+            
+            document.getElementById('timerPlayBtn').style.display = 'inline-block';
+            document.getElementById('timerPauseBtn').style.display = 'none';
+        }
+
+        function updateTimerDisplay() {
+            state.timerSeconds = (Date.now() - state.timerStart) / 1000;
+            const hours = Math.floor(state.timerSeconds / 3600);
+            const minutes = Math.floor((state.timerSeconds % 3600) / 60);
+            const seconds = Math.floor(state.timerSeconds % 60);
+            
+            const display = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = display;
+        }
+
+        function logTimer() {
+            const task = state.tasks.find(t => t.id === state.activeTimer);
+            if (!task || state.timerSeconds === 0) {
+                alert('No time logged');
+                return;
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            if (!state.daily[today]) state.daily[today] = {};
+            
+            const hours = state.timerSeconds / 3600;
+            state.daily[today][state.activeTimer] = (state.daily[today][state.activeTimer] || 0) + hours;
+            
+            saveState();
+            closeTimer();
+            renderCategories();
+            renderDailyReport();
+            renderWeeklyReport();
+        }
+
+        // DAILY REPORT
+        function renderDailyReport() {
+            const today = new Date().toISOString().split('T')[0];
+            const dailyData = state.daily[today] || {};
+            
+            let html = '<h2 style="margin-bottom: 1rem; font-size: 16px; font-weight: 600;">Today\'s Summary</h2>';
+            
+            state.categories.forEach(cat => {
+                const tasks = state.tasks.filter(t => t.category === cat.id);
+                const catHours = tasks.reduce((sum, t) => sum + (dailyData[t.id] || 0), 0);
+                
+                html += `
+                    <div class="report-card">
+                        <h3>${cat.emoji} ${cat.name}</h3>
+                        ${tasks.map(t => {
+                            const logged = dailyData[t.id] || 0;
+                            return `<div class="report-stat">
+                                <span>${t.emoji} ${t.name}</span>
+                                <strong>${logged.toFixed(2)}h / ${t.budget}h</strong>
+                            </div>`;
+                        }).join('')}
+                        <div class="report-stat" style="border-top: 1px solid #f0f0f0; padding-top: 0.5rem; margin-top: 0.5rem; font-weight: 600;">
+                            <span>Category Total</span>
+                            <strong>${catHours.toFixed(1)}h</strong>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('dailyReport').innerHTML = html;
+        }
+
+        // WEEKLY REPORT
+        function renderWeeklyReport() {
+            const today = new Date();
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - (today.getDay() || 7) + 1); // Monday
+            
+            let html = '<h2 style="margin-bottom: 1rem; font-size: 16px; font-weight: 600;">Weekly Summary</h2>';
+            
+            state.categories.forEach(cat => {
+                const tasks = state.tasks.filter(t => t.category === cat.id);
+                let weekTotal = 0;
+                
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(weekStart);
+                    date.setDate(date.getDate() + i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    const dayData = state.daily[dateStr] || {};
+                    tasks.forEach(t => {
+                        weekTotal += dayData[t.id] || 0;
+                    });
+                }
+                
+                html += `
+                    <div class="report-card">
+                        <h3>${cat.emoji} ${cat.name}</h3>
+                        ${tasks.map(t => {
+                            let taskTotal = 0;
+                            for (let i = 0; i < 7; i++) {
+                                const date = new Date(weekStart);
+                                date.setDate(date.getDate() + i);
+                                const dateStr = date.toISOString().split('T')[0];
+                                taskTotal += state.daily[dateStr]?.[t.id] || 0;
+                            }
+                            const budgetTotal = t.budget * 7;
+                            return `<div class="report-stat">
+                                <span>${t.emoji} ${t.name}</span>
+                                <strong>${taskTotal.toFixed(1)}h / ${budgetTotal}h</strong>
+                            </div>`;
+                        }).join('')}
+                        <div class="report-stat" style="border-top: 1px solid #f0f0f0; padding-top: 0.5rem; margin-top: 0.5rem; font-weight: 600;">
+                            <span>Category Total</span>
+                            <strong>${weekTotal.toFixed(1)}h</strong>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '<button class="reset-btn" onclick="resetWeek()">🔄 Reset for New Week</button>';
+            document.getElementById('weeklyReport').innerHTML = html;
+        }
+
+        function resetWeek() {
+            if (confirm('Reset all tasks for new week? This clears all daily logs.')) {
+                state.daily = {};
+                saveState();
+                renderCategories();
+                renderDailyReport();
+                renderWeeklyReport();
+            }
+        }
+
+        // TAB SWITCHING
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function toggleCategory(catId) {
+            const el = document.getElementById(`cat-${catId}`);
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // START
+        init();
+    </script>
+</body>
+</html>
