@@ -1,0 +1,38 @@
+name: Weekly Report Generator
+
+on:
+  schedule:
+    # Sunday 9:30 PM KST = Sunday 12:30 PM UTC
+    - cron: '30 12 * * 0'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Generate weekly report
+        run: |
+          node .github/scripts/generate-report.js
+
+      - name: Commit and push report
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add reports/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📊 Weekly report - week of $(date +%Y-%m-%d)"
+            git push
+          fi
